@@ -228,13 +228,17 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   max-height:0;overflow:hidden;
   transition:max-height .32s cubic-bezier(.4,0,.2,1),margin .32s;
 }
-.drawer.open{max-height:340px;margin-top:11px;}
+.drawer.open{max-height:600px;margin-top:11px;}
 .drawer-in{
   background:var(--surface-2);border:1px dashed var(--line-strong);
   border-radius:var(--r-md);padding:13px;display:flex;flex-direction:column;gap:9px;
 }
 .field-pair{display:flex;gap:9px;}
-.field-pair .inp:first-child{flex:1;}
+.field-pair .inp{flex:1;min-width:0;}
+.field-pair .btn{flex-shrink:0;}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.f-cell{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.f-cap{font-size:11px;color:var(--text-3);letter-spacing:.4px;font-weight:600;padding-left:2px;}
 
 /* ============ EMPTY ============ */
 .empty{
@@ -817,6 +821,14 @@ canvas{max-width:100%;}
   </div>
 
   <div class="card">
+    <div class="card-head"><span class="card-label">Звук</span></div>
+    <div class="btn-row">
+      <button class="btn sm" id="muteBtn" onclick="toggleMute()">—</button>
+      <button class="btn sm" onclick="unlockAudio();S.up();toast('Если тихо — проверь громкость')">Проверить</button>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="card-head"><span class="card-label">Оформление</span></div>
     <div class="swatches">
       <div class="sw s1" data-t="" onclick="setTheme(this)"></div>
@@ -901,22 +913,20 @@ canvas{max-width:100%;}
   <div class="card">
     <div class="card-head">
       <span class="card-label">Мои блюда</span>
-      <span class="tag" id="foodCount">0</span>
+      <button class="btn sm" onclick="clearFoods()" id="clearFoodsBtn">Очистить список</button>
     </div>
     <div class="drawer" id="dFood">
       <div class="drawer-in">
         <input class="inp" id="fName" placeholder="Название блюда">
         <select class="inp" id="fPer">
-          <option value="100">КБЖУ на 100 г</option>
-          <option value="1">КБЖУ за порцию / штуку</option>
+          <option value="100">Значения на 100 г</option>
+          <option value="1">Значения за порцию или штуку</option>
         </select>
-        <div class="field-pair">
-          <input class="inp" id="fK" type="number" placeholder="Ккал" inputmode="decimal">
-          <input class="inp" id="fP" type="number" placeholder="Белки" inputmode="decimal">
-        </div>
-        <div class="field-pair">
-          <input class="inp" id="fF" type="number" placeholder="Жиры" inputmode="decimal">
-          <input class="inp" id="fC" type="number" placeholder="Углеводы" inputmode="decimal">
+        <div class="f-grid">
+          <div class="f-cell"><span class="f-cap">Калории</span><input class="inp" id="fK" type="number" placeholder="0" inputmode="decimal"></div>
+          <div class="f-cell"><span class="f-cap">Белки, г</span><input class="inp" id="fP" type="number" placeholder="0" inputmode="decimal"></div>
+          <div class="f-cell"><span class="f-cap">Жиры, г</span><input class="inp" id="fF" type="number" placeholder="0" inputmode="decimal"></div>
+          <div class="f-cell"><span class="f-cap">Углеводы, г</span><input class="inp" id="fC" type="number" placeholder="0" inputmode="decimal"></div>
         </div>
         <button class="btn fill wide" onclick="addFood()">Сохранить блюдо</button>
       </div>
@@ -1129,9 +1139,28 @@ canvas{max-width:100%;}
 
 <script>
 /* ============ SOUND ============ */
-let _ac=null;
+let _ac=null,_unlocked=false;
 function ac(){if(!_ac){try{_ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}if(_ac.state==="suspended")_ac.resume();return _ac;}
-function tn(f,t,d,v,t0){const c=ac();if(!c)return;t0=(t0||0)+c.currentTime;v=v||0.12;const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=t||"sine";o.frequency.value=f;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+.015);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.start(t0);o.stop(t0+d+.05);}
+function unlockAudio(){
+  if(_unlocked)return;
+  const c=ac();if(!c)return;
+  try{const b=c.createBuffer(1,1,22050),s=c.createBufferSource();s.buffer=b;s.connect(c.destination);s.start(0);}catch(e){}
+  if(c.state==="suspended")c.resume().then(()=>{_unlocked=true;}).catch(()=>{});
+  else _unlocked=true;
+}
+["pointerdown","touchstart","click"].forEach(ev=>document.addEventListener(ev,unlockAudio,{passive:true}));
+function tn(freq,type,dur,vol,at){
+  if(typeof d!=="undefined"&&d&&d.mute)return;
+  const c=ac();if(!c)return;
+  const t0=(at||0)+c.currentTime;vol=vol||0.12;
+  const o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);
+  o.type=type||"sine";o.frequency.value=freq;
+  g.gain.setValueAtTime(0,t0);
+  g.gain.linearRampToValueAtTime(vol,t0+.015);
+  g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+  o.start(t0);o.stop(t0+dur+.05);
+}
 const S={
   tick(){tn(660,"sine",.09,.11);tn(880,"sine",.13,.09,.07);},
   full(){[523,659,784,1047].forEach((f,i)=>tn(f,"triangle",.2,.12,i*.09));},
@@ -1185,23 +1214,7 @@ const EVENTS={
   50:{icon:"🦉",t:"Молчание Афины",b:`Ступень 50. Половина пути к вершине пройдена.\n\nСила без ясного ума — просто мясо.\n\nДесять минут тишины каждое утро. Сядь, закрой глаза. Вдох на четыре, задержка на четыре, выдох на четыре. Разум — тоже мышца.`},
   100:{icon:"🔥",t:"Фермопилы",b:`Ступень 100.\n\nТы не тот, кто начинал. Тело перековано, воля закалена, привычка стала природой.\n\nПоследнее дело: напиши письмо себе прежнему. Расскажи, кем ты стал и что далось тяжелее всего. Запечатай. Открой через год.`}
 };
-const D_FOODS=[
-  {n:"Куриное филе",k:165,p:31,f:3.6,c:0,per:"100"},
-  {n:"Минтай",k:72,p:15.9,f:0.9,c:0,per:"100"},
-  {n:"Рис варёный",k:130,p:2.7,f:0.3,c:28,per:"100"},
-  {n:"Гречка варёная",k:92,p:3.4,f:0.6,c:20,per:"100"},
-  {n:"Овсянка сухая",k:366,p:12,f:6,c:62,per:"100"},
-  {n:"Творог 5%",k:121,p:17,f:5,c:3,per:"100"},
-  {n:"Яйцо",k:78,p:6.3,f:5.3,c:0.6,per:"1"},
-  {n:"Банан",k:89,p:1.1,f:0.3,c:23,per:"100"},
-  {n:"Яблоко",k:52,p:0.3,f:0.2,c:14,per:"100"},
-  {n:"Огурец",k:15,p:0.8,f:0.1,c:3.6,per:"100"},
-  {n:"Помидор",k:18,p:0.9,f:0.2,c:3.9,per:"100"},
-  {n:"Протеин",k:120,p:24,f:1.5,c:3,per:"1"},
-  {n:"Зефир",k:326,p:0.8,f:0.1,c:80,per:"100"},
-  {n:"Шоколад горький",k:546,p:6.2,f:35,c:48,per:"100"},
-  {n:"Масло оливковое",k:884,p:0,f:100,c:0,per:"100"}
-];
+const D_FOODS=[];
 const RANKS=[{n:"Легенда",m:100},{n:"Царь",m:65},{n:"Стратег",m:50},{n:"Спартанец",m:35},{n:"Гоплит",m:25},{n:"Воин",m:15},{n:"Новобранец",m:1}];
 const GORDER=["Тело","Дисциплина","Разум"];
 
@@ -1217,7 +1230,7 @@ if(!d){
      foods:D_FOODS.map(f=>({...f})),diary:{},norm:{k:2400,p:150,f:80,c:270},
      theme:"",playerName:"",avatarImg:"",punishment:null,seenEvents:[]};
 }
-if(!Array.isArray(d.foods)||!d.foods.length)d.foods=D_FOODS.map(f=>({...f}));
+if(!Array.isArray(d.foods))d.foods=[];
 if(!d.diary||typeof d.diary!=="object")d.diary={};
 if(!d.norm)d.norm={k:2400,p:150,f:80,c:270};
 if(!Array.isArray(d.questList)||!d.questList.length)d.questList=D_QUESTS.map(q=>({...q,done:false,failed:false}));
@@ -1698,20 +1711,32 @@ function eat(f){
 /* --- food library --- */
 function renderFoodLib(){
   const box=document.getElementById("foodLib");box.innerHTML="";
-  document.getElementById("foodCount").textContent=d.foods.length;
+  const btn=document.getElementById("clearFoodsBtn");
+  if(btn)btn.style.display=d.foods.length?"inline-flex":"none";
   if(!d.foods.length){
     box.innerHTML=`<div class="empty"><div class="empty-txt">Блюд пока нет.<br>Добавь то, что ешь регулярно.</div></div>`;
     return;
   }
-  d.foods.forEach((f,i)=>{
+  d.foods.forEach(f=>{
     const row=document.createElement("div");row.className="item";
     const unit=f.per==="1"?"порция":"100 г";
     row.innerHTML=`<div class="item-body"><div class="item-t">${f.n}</div>
       <div class="item-s">${f.k} ккал · Б ${f.p} Ж ${f.f} У ${f.c} / ${unit}</div></div>`;
     const del=document.createElement("button");del.className="icon-btn";del.innerHTML=ICON_TRASH;
-    del.onclick=()=>{if(confirm("Удалить «"+f.n+"» из списка блюд?")){d.foods.splice(i,1);save();renderFood();}};
+    del.onclick=e=>{
+      e.stopPropagation();
+      if(!confirm("Удалить «"+f.n+"» из списка блюд?"))return;
+      const idx=d.foods.indexOf(f);
+      if(idx>-1)d.foods.splice(idx,1);
+      save();renderFood();toast("Блюдо удалено");S.no();
+    };
     row.appendChild(del);box.appendChild(row);
   });
+}
+function clearFoods(){
+  if(!d.foods.length)return;
+  if(!confirm("Удалить все блюда из списка? Записи в дневнике останутся."))return;
+  d.foods=[];save();renderFood();toast("Список очищен");S.no();
 }
 function addFood(){
   const n=document.getElementById("fName").value.trim();
@@ -1817,7 +1842,14 @@ function uploadAvatar(e){
   r.onload=ev=>{d.avatarImg=ev.target.result;save();render();toast("Портрет обновлён","good");};
   r.readAsDataURL(f);
 }
+function toggleMute(){
+  d.mute=!d.mute;save();renderWarrior();
+  if(!d.mute){unlockAudio();S.ok();}
+  toast(d.mute?"Звук выключен":"Звук включён");
+}
 function renderWarrior(){
+  const mb=document.getElementById("muteBtn");
+  if(mb)mb.textContent=d.mute?"Включить звук":"Выключить звук";
   document.getElementById("nameTxt").textContent=d.playerName||"Безымянный";
   document.getElementById("wRank").textContent=d.rank;
   const f=document.getElementById("faceImg");
