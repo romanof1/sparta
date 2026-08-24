@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
+<title>ΑΓΩΓΗ</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#100E0C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Agoge">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Archivo:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#100E0C;
+  --surface:#191613;
+  --surface-2:#221E19;
+  --surface-3:#2C2721;
+  --line:rgba(237,230,218,0.08);
+  --line-strong:rgba(237,230,218,0.14);
+  --text:#EDE6DA;
+  --text-2:#9A8F84;
+  --text-3:#6B625A;
+  --accent:#D64933;
+  --accent-2:#A6341F;
+  --accent-soft:rgba(214,73,51,0.12);
+  --accent-glow:rgba(214,73,51,0.28);
+  --bronze:#C89B54;
+  --danger:#E4573D;
+  --ok:#7A9A5B;
+  --r-lg:18px; --r-md:14px; --r-sm:10px;
+  --nav-h:66px;
+}
+.t-bronze{--accent:#C89B54;--accent-2:#96702F;--accent-soft:rgba(200,155,84,0.12);--accent-glow:rgba(200,155,84,0.28);}
+.t-olive{--accent:#8FA35E;--accent-2:#61763B;--accent-soft:rgba(143,163,94,0.12);--accent-glow:rgba(143,163,94,0.28);}
+.t-steel{--accent:#6D8CA8;--accent-2:#45647E;--accent-soft:rgba(109,140,168,0.12);--accent-glow:rgba(109,140,168,0.28);}
+.t-obsidian{--accent:#8E6BB8;--accent-2:#61438A;--accent-soft:rgba(142,107,184,0.12);--accent-glow:rgba(142,107,184,0.28);}
+.t-ash{--accent:#B3A99C;--accent-2:#807668;--accent-soft:rgba(179,169,156,0.1);--accent-glow:rgba(179,169,156,0.22);}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100dvh;overflow-x:hidden;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom));
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(70% 40% at 50% -5%, var(--accent-soft), transparent 65%),
+    radial-gradient(50% 30% at 100% 100%, rgba(200,155,84,0.05), transparent 70%);
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+/* ============ HEADER ============ */
+.top{
+  position:sticky;top:0;z-index:60;
+  padding-top:env(safe-area-inset-top);
+  background:rgba(16,14,12,0.82);
+  backdrop-filter:blur(20px) saturate(1.4);
+  border-bottom:1px solid var(--line);
+}
+.top-row{
+  display:flex;align-items:center;gap:14px;
+  padding:11px 18px 12px;max-width:720px;margin:0 auto;
+}
+.brand{display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.brand-mark{
+  width:32px;height:32px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(150deg,var(--accent),var(--accent-2));
+  display:grid;place-items:center;
+  font-family:'Cinzel',serif;font-size:15px;font-weight:800;color:#fff;
+  box-shadow:0 4px 14px var(--accent-glow);
+}
+.brand-txt{font-family:'Cinzel',serif;font-size:15px;font-weight:800;letter-spacing:2.5px;line-height:1;}
+.brand-sub{font-size:9.5px;color:var(--text-3);letter-spacing:1.6px;text-transform:uppercase;margin-top:3px;font-weight:500;}
+
+.lvl-chip{
+  margin-left:auto;display:flex;align-items:center;gap:10px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:5px 6px 5px 13px;flex-shrink:0;
+}
+.lvl-meta{text-align:right;line-height:1.15;}
+.lvl-rank{font-family:'Cinzel',serif;font-size:11.5px;font-weight:600;color:var(--bronze);white-space:nowrap;}
+.lvl-xp{font-size:9.5px;color:var(--text-3);font-variant-numeric:tabular-nums;margin-top:1px;}
+.ring{width:36px;height:36px;flex-shrink:0;position:relative;}
+.ring svg{transform:rotate(-90deg);display:block;}
+.ring-num{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+.legend .lvl-rank{color:#FF7A45;text-shadow:0 0 12px rgba(255,122,69,0.6);}
+
+/* ============ SHELL ============ */
+.shell{max-width:720px;margin:0 auto;padding:16px 16px 8px;position:relative;z-index:1;}
+.view{display:none;animation:fade .28s ease;}
+.view.on{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+.view-head{margin-bottom:16px;}
+.view-title{font-family:'Archivo',sans-serif;font-size:26px;font-weight:700;letter-spacing:-0.6px;line-height:1.1;}
+.view-note{font-size:13px;color:var(--text-2);margin-top:5px;line-height:1.5;}
+
+/* ============ CARD ============ */
+.card{
+  background:linear-gradient(168deg,var(--surface) 0%,rgba(25,22,19,0.7) 100%);
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:16px;margin-bottom:12px;
+}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin-bottom:13px;
+}
+.card-label{
+  font-family:'Archivo',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:1.4px;text-transform:uppercase;color:var(--text-2);
+}
+
+/* ============ TODAY HERO ============ */
+.hero{
+  background:
+    radial-gradient(120% 100% at 0% 0%, var(--accent-soft), transparent 60%),
+    linear-gradient(168deg,var(--surface-2),var(--surface));
+  border:1px solid var(--line-strong);border-radius:var(--r-lg);
+  padding:18px;margin-bottom:14px;
+  display:flex;align-items:center;gap:18px;
+}
+.hero-ring{width:78px;height:78px;flex-shrink:0;position:relative;}
+.hero-ring svg{transform:rotate(-90deg);display:block;}
+.hero-ring-txt{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1;}
+.hero-pct{font-family:'Archivo',sans-serif;font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;}
+.hero-body{flex:1;min-width:0;}
+.hero-title{font-family:'Archivo',sans-serif;font-size:17px;font-weight:600;letter-spacing:-0.2px;}
+.hero-line{font-size:12.5px;color:var(--text-2);margin-top:4px;line-height:1.5;}
+.hero-tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.tag{
+  font-size:11px;font-weight:500;padding:4px 9px;border-radius:999px;
+  background:var(--surface-3);border:1px solid var(--line);color:var(--text-2);
+  display:inline-flex;align-items:center;gap:5px;
+}
+.tag.hot{background:var(--accent-soft);border-color:var(--accent-glow);color:var(--accent);}
+.tag.gold{color:var(--bronze);border-color:rgba(200,155,84,0.25);}
+
+/* ============ DUTY ROWS ============ */
+.grp{margin-bottom:6px;}
+.grp-name{
+  font-family:'Archivo',sans-serif;font-size:10.5px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);
+  padding:12px 2px 7px;display:flex;align-items:center;gap:8px;
+}
+.grp-name::after{content:'';flex:1;height:1px;background:var(--line);}
+
+.row{
+  display:flex;align-items:center;gap:11px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:11px 12px;margin-bottom:7px;
+  transition:opacity .25s,border-color .25s,background .25s;
+}
+.row.done{opacity:.38;background:transparent;}
+.row.fail{border-color:rgba(228,87,61,0.28);background:rgba(228,87,61,0.05);}
+.row-txt{flex:1;min-width:0;font-size:14.5px;font-weight:450;line-height:1.35;}
+.row.done .row-txt{text-decoration:line-through;color:var(--text-2);}
+.row.fail .row-txt{color:#E89380;}
+.row-xp{
+  font-size:11px;font-weight:600;color:var(--accent);
+  font-variant-numeric:tabular-nums;flex-shrink:0;
+}
+.row-xp.neg{color:var(--danger);}
+.row-acts{display:flex;gap:7px;align-items:center;flex-shrink:0;}
+
+/* ============ CONTROLS ============ */
+.tick,.cross{
+  width:34px;height:34px;border-radius:11px;flex-shrink:0;
+  display:grid;place-items:center;cursor:pointer;
+  border:1.5px solid;background:transparent;
+  transition:transform .14s,background .2s;
+}
+.tick{border-color:var(--accent);color:var(--accent);}
+.tick.on{background:var(--accent);color:#12100E;border-color:var(--accent);}
+.cross{border-color:rgba(228,87,61,0.4);color:var(--danger);}
+.tick:active,.cross:active{transform:scale(.9);}
+.tick svg,.cross svg{width:15px;height:15px;}
+
+.icon-btn{
+  width:28px;height:28px;border-radius:9px;flex-shrink:0;
+  display:grid;place-items:center;cursor:pointer;
+  border:1px solid var(--line);background:transparent;color:var(--text-3);
+  transition:color .2s,border-color .2s;
+}
+.icon-btn:active{color:var(--danger);border-color:rgba(228,87,61,0.4);}
+.icon-btn svg{width:13px;height:13px;}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  border-radius:var(--r-md);cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+  padding:11px 17px;border:1px solid var(--line-strong);
+  background:var(--surface-2);color:var(--text);
+  transition:transform .14s,background .2s,border-color .2s;
+}
+.btn:active{transform:scale(.97);}
+.btn svg{width:15px;height:15px;flex-shrink:0;}
+.btn.fill{background:var(--accent);border-color:var(--accent);color:#12100E;box-shadow:0 4px 16px var(--accent-glow);}
+.btn.tint{background:var(--accent-soft);border-color:var(--accent-glow);color:var(--accent);}
+.btn.warn{background:rgba(228,87,61,0.1);border-color:rgba(228,87,61,0.32);color:var(--danger);}
+.btn.sm{padding:8px 13px;font-size:12.5px;border-radius:var(--r-sm);}
+.btn.wide{width:100%;}
+.btn-row{display:flex;gap:9px;flex-wrap:wrap;}
+
+.inp,select.inp{
+  background:var(--surface-2);border:1px solid var(--line-strong);
+  border-radius:var(--r-md);color:var(--text);
+  padding:11px 13px;font-family:'Inter',sans-serif;font-size:14px;
+  outline:none;transition:border-color .2s;-webkit-appearance:none;width:100%;
+}
+.inp:focus{border-color:var(--accent);}
+.inp::placeholder{color:var(--text-3);}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A8F84' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;background-size:16px;padding-right:38px;}
+
+/* ============ ADD DRAWER ============ */
+.drawer{
+  max-height:0;overflow:hidden;
+  transition:max-height .32s cubic-bezier(.4,0,.2,1),margin .32s;
+}
+.drawer.open{max-height:340px;margin-top:11px;}
+.drawer-in{
+  background:var(--surface-2);border:1px dashed var(--line-strong);
+  border-radius:var(--r-md);padding:13px;display:flex;flex-direction:column;gap:9px;
+}
+.field-pair{display:flex;gap:9px;}
+.field-pair .inp:first-child{flex:1;}
+
+/* ============ EMPTY ============ */
+.empty{
+  text-align:center;padding:30px 18px;color:var(--text-3);
+}
+.empty-icon{font-size:28px;opacity:.45;margin-bottom:9px;}
+.empty-txt{font-size:13.5px;line-height:1.6;}
+
+/* ============ PROGRESS BAR ============ */
+.meter{height:6px;background:var(--surface-3);border-radius:999px;overflow:hidden;}
+.meter-fill{height:100%;background:linear-gradient(90deg,var(--accent-2),var(--accent));border-radius:999px;transition:width .55s cubic-bezier(.34,1.3,.64,1);}
+
+/* ============ STAT TILES ============ */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.tile{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:13px 9px;text-align:center;
+}
+.tile-v{font-family:'Archivo',sans-serif;font-size:19px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;}
+.tile-l{font-size:10.5px;color:var(--text-3);margin-top:5px;letter-spacing:0.3px;}
+
+/* ============ LIST ITEM ============ */
+.item{
+  display:flex;align-items:center;gap:11px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:12px;margin-bottom:7px;
+  transition:border-color .2s;
+}
+.item.active{border-color:var(--accent-glow);background:var(--accent-soft);}
+.item.done{opacity:.4;}
+.item-body{flex:1;min-width:0;cursor:pointer;}
+.item-t{font-size:14px;font-weight:500;line-height:1.35;}
+.item.done .item-t{text-decoration:line-through;color:var(--text-2);}
+.item-s{font-size:11.5px;color:var(--text-3);margin-top:3px;}
+.item-s.late{color:var(--danger);}
+
+/* ============ TRIAL EXERCISE ============ */
+.ex{
+  display:flex;align-items:center;gap:11px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:11px 12px;margin-bottom:7px;
+  transition:opacity .25s,border-color .25s;
+}
+.ex.on{opacity:.45;border-color:rgba(122,154,91,0.3);}
+.ex.on .ex-t{text-decoration:line-through;color:var(--text-2);}
+.ex-t{flex:1;font-size:14px;font-weight:450;}
+
+/* ============ WARRIOR ============ */
+.warrior{display:flex;align-items:center;gap:15px;margin-bottom:16px;}
+.face{position:relative;flex-shrink:0;}
+.face-img{
+  width:76px;height:76px;border-radius:22px;overflow:hidden;
+  background:linear-gradient(150deg,var(--accent-soft),var(--surface-2));
+  border:1px solid var(--line-strong);
+  display:grid;place-items:center;
+  font-family:'Cinzel',serif;font-size:26px;font-weight:800;color:var(--accent);
+}
+.face-img img{width:100%;height:100%;object-fit:cover;}
+.face-edit{
+  position:absolute;bottom:-3px;right:-3px;
+  width:26px;height:26px;border-radius:9px;border:2px solid var(--bg);
+  background:var(--accent);color:#12100E;cursor:pointer;
+  display:grid;place-items:center;
+}
+.face-edit svg{width:12px;height:12px;}
+.warrior-b{flex:1;min-width:0;}
+.warrior-name{font-family:'Archivo',sans-serif;font-size:19px;font-weight:700;letter-spacing:-0.3px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;}
+.warrior-name svg{width:13px;height:13px;color:var(--text-3);flex-shrink:0;}
+.warrior-rank{
+  display:inline-block;margin-top:7px;
+  font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--bronze);
+  background:rgba(200,155,84,0.1);border:1px solid rgba(200,155,84,0.22);
+  border-radius:999px;padding:3px 12px;
+}
+.warrior-goal{font-size:12.5px;color:var(--text-3);margin-top:8px;}
+
+/* ============ LOG ============ */
+.log{
+  display:flex;justify-content:space-between;gap:10px;
+  padding:10px 12px;background:var(--surface-2);
+  border-left:2px solid var(--accent);border-radius:0 var(--r-sm) var(--r-sm) 0;
+  margin-bottom:6px;font-size:13px;
+}
+.log-t{color:var(--text);min-width:0;}
+.log-d{color:var(--text-3);font-size:11.5px;flex-shrink:0;font-variant-numeric:tabular-nums;}
+
+/* ============ TABLE ============ */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{
+  font-family:'Archivo',sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:1.3px;text-transform:uppercase;color:var(--text-3);
+  text-align:left;padding:9px 10px;border-bottom:1px solid var(--line-strong);
+}
+.tbl td{padding:10px;border-bottom:1px solid var(--line);color:var(--text-2);line-height:1.5;vertical-align:top;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl td:first-child{color:var(--bronze);font-family:'Cinzel',serif;font-weight:600;white-space:nowrap;font-size:12.5px;}
+.tbl td:nth-child(2){font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--text-3);}
+
+/* ============ INFO ============ */
+.note{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:14px;margin-bottom:9px;
+}
+.note-t{font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.note p{font-size:13.5px;color:var(--text-2);line-height:1.65;}
+.creed{
+  font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:var(--bronze);
+  text-align:center;padding:20px 12px;letter-spacing:1.5px;line-height:1.6;
+}
+
+/* ============ FOOD DIARY ============ */
+.week-strip{display:flex;gap:5px;}
+.day-cell{
+  flex:1;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:9px 2px;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;min-width:0;
+}
+.day-cell.on{background:var(--accent-soft);border-color:var(--accent-glow);}
+.day-cell.today .day-n{color:var(--accent);}
+.day-w{font-size:10px;color:var(--text-3);letter-spacing:.4px;text-transform:uppercase;font-weight:600;}
+.day-n{font-family:'Archivo',sans-serif;font-size:15px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;}
+.day-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);margin:4px auto 0;opacity:0;}
+.day-cell.has .day-dot{opacity:1;}
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px;}
+.week-lbl{font-size:12.5px;color:var(--text-2);font-weight:500;}
+.wk-arrow{
+  width:30px;height:30px;border-radius:9px;flex-shrink:0;
+  display:grid;place-items:center;cursor:pointer;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--text-2);
+}
+.wk-arrow svg{width:14px;height:14px;}
+.wk-arrow:active{transform:scale(.92);}
+
+.macro-row{display:flex;gap:8px;margin-top:12px;}
+.macro{flex:1;min-width:0;}
+.macro-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;gap:4px;}
+.macro-n{font-size:10.5px;color:var(--text-3);letter-spacing:.4px;text-transform:uppercase;font-weight:600;}
+.macro-v{font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text-2);}
+.macro-bar{height:4px;background:var(--surface-3);border-radius:999px;overflow:hidden;}
+.macro-fill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.34,1.3,.64,1);}
+.mf-p{background:#7FA8D4;}.mf-f{background:#D4B45C;}.mf-c{background:#9BC47F;}
+
+.meal-block{margin-bottom:14px;}
+.meal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.meal-name{font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;letter-spacing:.3px;}
+.meal-kcal{font-size:11.5px;color:var(--text-3);font-variant-numeric:tabular-nums;margin-left:auto;}
+.add-mini{
+  width:28px;height:28px;border-radius:9px;flex-shrink:0;
+  display:grid;place-items:center;cursor:pointer;
+  border:1px solid var(--accent-glow);background:var(--accent-soft);color:var(--accent);
+}
+.add-mini svg{width:14px;height:14px;}
+.add-mini:active{transform:scale(.9);}
+.food-line{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:9px 11px;margin-bottom:5px;
+}
+.food-b{flex:1;min-width:0;}
+.food-n{font-size:13.5px;font-weight:450;line-height:1.3;}
+.food-m{font-size:11px;color:var(--text-3);margin-top:2px;font-variant-numeric:tabular-nums;}
+.food-k{font-size:12.5px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;flex-shrink:0;}
+.meal-empty{font-size:12.5px;color:var(--text-3);padding:8px 2px;}
+
+.stat-week{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:12px;margin-bottom:7px;
+}
+.stat-week.now{border-color:var(--accent-glow);background:var(--accent-soft);}
+.sw-lbl{flex:1;min-width:0;}
+.sw-t{font-size:13px;font-weight:600;}
+.sw-s{font-size:11px;color:var(--text-3);margin-top:2px;}
+.sw-v{text-align:right;flex-shrink:0;}
+.sw-k{font-family:'Archivo',sans-serif;font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;}
+.sw-m{font-size:10.5px;color:var(--text-3);margin-top:3px;font-variant-numeric:tabular-nums;}
+
+/* food picker sheet */
+.picker{
+  position:fixed;left:0;right:0;bottom:0;z-index:95;
+  background:var(--surface);border-top:1px solid var(--line-strong);
+  border-radius:24px 24px 0 0;max-width:720px;margin:0 auto;
+  transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;max-height:88dvh;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.picker.open{transform:translateY(0);}
+.picker-top{padding:10px 16px 0;flex-shrink:0;}
+.picker-ttl{font-family:'Archivo',sans-serif;font-size:17px;font-weight:700;margin-bottom:11px;}
+.picker-list{overflow-y:auto;padding:0 16px 16px;flex:1;-webkit-overflow-scrolling:touch;}
+.pick-row{
+  display:flex;align-items:center;gap:11px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:11px;margin-bottom:6px;cursor:pointer;
+}
+.pick-row:active{border-color:var(--accent-glow);}
+.pick-b{flex:1;min-width:0;}
+.pick-n{font-size:13.5px;font-weight:500;}
+.pick-m{font-size:11px;color:var(--text-3);margin-top:2px;}
+
+/* ============ MEALS / SUPPS ============ */
+.meal{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px;align-items:baseline;}
+.meal:last-child{border-bottom:none;}
+.meal-w{
+  font-family:'Archivo',sans-serif;font-size:10.5px;font-weight:600;
+  letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);
+  width:66px;flex-shrink:0;
+}
+.meal-d{color:var(--text-2);line-height:1.5;}
+.supps{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.supp{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:11px;}
+.supp-n{font-size:13px;font-weight:600;color:var(--text);}
+.supp-d{font-size:11.5px;color:var(--text-3);margin-top:3px;}
+
+/* ============ THEMES ============ */
+.swatches{display:flex;gap:10px;flex-wrap:wrap;}
+.sw{
+  width:36px;height:36px;border-radius:12px;cursor:pointer;
+  border:2px solid transparent;position:relative;
+  transition:transform .16s;
+}
+.sw:active{transform:scale(.9);}
+.sw.on{border-color:var(--text);}
+.sw.on::after{
+  content:'';position:absolute;inset:0;margin:auto;
+  width:9px;height:9px;border-radius:50%;background:rgba(0,0,0,.45);
+}
+.s1{background:#D64933;}.s2{background:#C89B54;}.s3{background:#8FA35E;}
+.s4{background:#6D8CA8;}.s5{background:#8E6BB8;}.s6{background:#B3A99C;}
+
+/* ============ CHART ============ */
+.chart-box{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:12px;}
+canvas{max-width:100%;}
+
+/* ============ BOTTOM NAV ============ */
+.nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:70;
+  background:rgba(16,14,12,0.9);
+  backdrop-filter:blur(22px) saturate(1.5);
+  border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-in{
+  display:flex;max-width:720px;margin:0 auto;
+  height:var(--nav-h);align-items:stretch;
+}
+.nav-btn{
+  flex:1;background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  color:var(--text-3);transition:color .2s;padding:0;position:relative;
+}
+.nav-btn svg{width:21px;height:21px;stroke-width:1.7;}
+.nav-btn span{font-size:10px;font-weight:500;letter-spacing:0.2px;}
+.nav-btn.on{color:var(--accent);}
+.nav-btn.on::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:26px;height:2.5px;background:var(--accent);border-radius:0 0 3px 3px;
+}
+.nav-dot{
+  position:absolute;top:11px;right:calc(50% - 17px);
+  width:7px;height:7px;border-radius:50%;background:var(--danger);
+  border:1.5px solid var(--bg);
+}
+
+/* ============ SHEET ============ */
+.sheet-bg{
+  position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.6);
+  backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .28s;
+}
+.sheet-bg.open{opacity:1;pointer-events:auto;}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:81;
+  background:var(--surface);border-top:1px solid var(--line-strong);
+  border-radius:24px 24px 0 0;
+  padding:10px 16px calc(20px + env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);
+  max-width:720px;margin:0 auto;
+}
+.sheet.open{transform:translateY(0);}
+.sheet-grip{width:38px;height:4px;background:var(--line-strong);border-radius:999px;margin:0 auto 16px;}
+.sheet-item{
+  display:flex;align-items:center;gap:13px;width:100%;
+  background:none;border:none;cursor:pointer;color:var(--text);
+  padding:14px 6px;border-bottom:1px solid var(--line);
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:500;text-align:left;
+}
+.sheet-item:last-child{border-bottom:none;}
+.sheet-item svg{width:19px;height:19px;color:var(--accent);flex-shrink:0;stroke-width:1.7;}
+.sheet-item .chev{margin-left:auto;color:var(--text-3);width:15px;height:15px;}
+
+/* ============ TOAST ============ */
+.toast{
+  position:fixed;left:50%;bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom));
+  transform:translateX(-50%) translateY(14px);
+  background:var(--surface-3);border:1px solid var(--line-strong);
+  border-radius:999px;padding:11px 20px;z-index:90;
+  font-size:13px;font-weight:600;letter-spacing:0.2px;
+  color:var(--text);white-space:nowrap;max-width:92vw;
+  overflow:hidden;text-overflow:ellipsis;
+  opacity:0;pointer-events:none;transition:opacity .26s,transform .26s;
+  box-shadow:0 10px 32px rgba(0,0,0,.5);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.good{border-color:var(--accent-glow);color:var(--accent);}
+.toast.bad{border-color:rgba(228,87,61,0.4);color:var(--danger);}
+
+/* ============ MODAL ============ */
+.modal-bg{
+  position:fixed;inset:0;z-index:100;background:rgba(8,7,6,.86);
+  backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-bg.open{display:flex;}
+.modal{
+  background:linear-gradient(168deg,var(--surface-2),var(--surface));
+  border:1px solid var(--line-strong);border-radius:22px;
+  padding:26px 22px;width:100%;max-width:400px;text-align:center;
+  animation:pop .38s cubic-bezier(.34,1.4,.64,1);
+  max-height:90dvh;overflow-y:auto;
+}
+@keyframes pop{from{transform:scale(.86);opacity:0;}to{transform:none;opacity:1;}}
+.modal.punish{border-color:rgba(228,87,61,0.45);box-shadow:0 0 60px rgba(228,87,61,0.14);}
+.modal.honor{border-color:rgba(200,155,84,0.4);box-shadow:0 0 60px rgba(200,155,84,0.12);}
+.modal-mark{
+  width:52px;height:52px;border-radius:16px;margin:0 auto 15px;
+  display:grid;place-items:center;font-size:24px;
+  background:var(--accent-soft);border:1px solid var(--accent-glow);
+}
+.modal.punish .modal-mark{background:rgba(228,87,61,0.12);border-color:rgba(228,87,61,0.32);}
+.modal.honor .modal-mark{background:rgba(200,155,84,0.1);border-color:rgba(200,155,84,0.28);}
+.modal-t{font-family:'Archivo',sans-serif;font-size:19px;font-weight:700;letter-spacing:-0.3px;}
+.modal.punish .modal-t{color:var(--danger);}
+.modal.honor .modal-t{color:var(--bronze);}
+.modal-s{font-size:12px;color:var(--text-3);margin-top:6px;letter-spacing:0.4px;}
+.modal-task{
+  background:var(--surface-3);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:15px;margin:18px 0;
+}
+.modal-task-n{font-family:'Archivo',sans-serif;font-size:17px;font-weight:700;color:var(--danger);}
+.modal-task-d{font-size:13px;color:var(--text-2);line-height:1.6;margin-top:7px;}
+.modal-body{font-size:14px;color:var(--text-2);line-height:1.75;text-align:left;margin:16px 0 20px;white-space:pre-line;}
+
+::-webkit-scrollbar{width:0;height:0;}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <div class="brand-mark">Λ</div>
+      <div>
+        <div class="brand-txt">ΑΓΩΓΗ</div>
+        <div class="brand-sub">Путь воина</div>
+      </div>
+    </div>
+    <div class="lvl-chip" id="lvlChip">
+      <div class="lvl-meta">
+        <div class="lvl-rank" id="hRank">Новобранец</div>
+        <div class="lvl-xp"><span id="hXP">0</span>/100 доблести</div>
+      </div>
+      <div class="ring">
+        <svg width="36" height="36" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15" fill="none" stroke="var(--surface-3)" stroke-width="3"/>
+          <circle id="hRing" cx="18" cy="18" r="15" fill="none" stroke="var(--accent)" stroke-width="3"
+                  stroke-linecap="round" stroke-dasharray="94.2" stroke-dashoffset="94.2"
+                  style="transition:stroke-dashoffset .6s cubic-bezier(.34,1.3,.64,1)"/>
+        </svg>
+        <div class="ring-num" id="hLevel">1</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+
+<!-- ============ ДОЛГ ============ -->
+<section class="view on" id="v-duties">
+  <div class="view-head">
+    <h1 class="view-title">Сегодня</h1>
+    <p class="view-note" id="todayDate"></p>
+  </div>
+
+  <div class="hero">
+    <div class="hero-ring">
+      <svg width="78" height="78" viewBox="0 0 78 78">
+        <circle cx="39" cy="39" r="33" fill="none" stroke="var(--surface-3)" stroke-width="6"/>
+        <circle id="dayRing" cx="39" cy="39" r="33" fill="none" stroke="var(--accent)" stroke-width="6"
+                stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="207.3"
+                style="transition:stroke-dashoffset .6s cubic-bezier(.34,1.3,.64,1)"/>
+      </svg>
+      <div class="hero-ring-txt"><div class="hero-pct" id="dayPct">0%</div></div>
+    </div>
+    <div class="hero-body">
+      <div class="hero-title" id="heroTitle">Долг ждёт</div>
+      <div class="hero-line" id="heroLine">—</div>
+      <div class="hero-tags">
+        <span class="tag hot">🔥 <span id="streakVal">0</span> дней подряд</span>
+        <span class="tag gold">Ступень <span id="tagLevel">1</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div id="dutyList"></div>
+    <div class="drawer" id="dQuest">
+      <div class="drawer-in">
+        <input class="inp" id="qLabel" placeholder="Что нужно делать каждый день">
+        <div class="field-pair">
+          <select class="inp" id="qGroup">
+            <option value="Тело">Тело</option>
+            <option value="Дисциплина">Дисциплина</option>
+            <option value="Разум">Разум</option>
+          </select>
+          <input class="inp" id="qXP" type="number" value="10" style="width:82px" inputmode="numeric">
+        </div>
+        <button class="btn fill wide" onclick="addQuest()">Добавить долг</button>
+      </div>
+    </div>
+    <button class="btn wide sm" onclick="drawer('dQuest')" style="margin-top:11px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Новый долг
+    </button>
+  </div>
+</section>
+
+<!-- ============ ИСПЫТАНИЯ ============ -->
+<section class="view" id="v-trials">
+  <div class="view-head">
+    <h1 class="view-title">Испытания</h1>
+    <p class="view-note">Отметь упражнения по мере выполнения — доблесть начислится по факту.</p>
+  </div>
+
+  <div class="card">
+    <select class="inp" id="trialPick" style="margin-bottom:11px"></select>
+    <div class="btn-row">
+      <button class="btn fill" onclick="startTrial()" style="flex:1">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Начать
+      </button>
+      <button class="btn" onclick="endTrial()" style="flex:1">Завершить</button>
+    </div>
+    <div id="trialBox" style="margin-top:13px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Свои испытания</span></div>
+    <div id="customTrials"></div>
+    <div class="drawer" id="dTrial">
+      <div class="drawer-in">
+        <input class="inp" id="tName" placeholder="Название испытания">
+        <input class="inp" id="tEx" placeholder="Отжимания 4×15; Присед 4×20; Планка 3×1мин">
+        <p style="font-size:11.5px;color:var(--text-3);line-height:1.5">Упражнения через точку с запятой</p>
+        <button class="btn fill wide" onclick="addTrial()">Создать</button>
+      </div>
+    </div>
+    <button class="btn wide sm" onclick="drawer('dTrial')" style="margin-top:11px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Создать испытание
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Последние битвы</span></div>
+    <div id="trialLog"></div>
+  </div>
+</section>
+
+<!-- ============ ЦЕЛИ ============ -->
+<section class="view" id="v-goals">
+  <div class="view-head">
+    <h1 class="view-title">Цели</h1>
+    <p class="view-note">Большие рубежи, к которым ведёт ежедневный долг. За каждый — 50 доблести.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">В работе</span></div>
+    <div id="goalsOpen"></div>
+    <div class="drawer" id="dGoal">
+      <div class="drawer-in">
+        <input class="inp" id="gText" placeholder="Например: 20 подтягиваний подряд">
+        <input class="inp" id="gDate" type="date">
+        <button class="btn fill wide" onclick="addGoal()">Поставить цель</button>
+      </div>
+    </div>
+    <button class="btn wide sm" onclick="drawer('dGoal')" style="margin-top:11px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Новая цель
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Достигнуто</span></div>
+    <div id="goalsDone"></div>
+  </div>
+</section>
+
+<!-- ============ ТРАКТАТЫ ============ -->
+<section class="view" id="v-codex">
+  <div class="view-head">
+    <h1 class="view-title">Трактаты</h1>
+    <p class="view-note">Норма чтения растёт на 5 страниц за каждые 7 дней серии.</p>
+  </div>
+
+  <div class="card">
+    <div id="bookNow"></div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn fill" onclick="readPages()" style="flex:1">+<span id="pps">20</span> страниц</button>
+      <button class="btn" onclick="finishBook()">Прочитан</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Библиотека</span></div>
+    <div id="library"></div>
+    <div class="drawer" id="dBook">
+      <div class="drawer-in">
+        <input class="inp" id="bTitle" placeholder="Автор — Название">
+        <div class="field-pair">
+          <input class="inp" id="bPages" type="number" value="300" placeholder="Страниц" inputmode="numeric">
+          <button class="btn fill" onclick="addBook()" style="white-space:nowrap">Добавить</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn wide sm" onclick="drawer('dBook')" style="margin-top:11px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Добавить трактат
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Освоено</span></div>
+    <div id="booksRead"></div>
+  </div>
+</section>
+
+<!-- ============ ВОИН ============ -->
+<section class="view" id="v-warrior">
+  <div class="view-head"><h1 class="view-title">Воин</h1></div>
+
+  <div class="card">
+    <div class="warrior">
+      <div class="face">
+        <div class="face-img" id="faceImg">Λ</div>
+        <button class="face-edit" onclick="document.getElementById('avaFile').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+        </button>
+        <input type="file" id="avaFile" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
+      </div>
+      <div class="warrior-b">
+        <div class="warrior-name" id="nameShow" onclick="editName()">
+          <span id="nameTxt">Безымянный</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+        </div>
+        <input class="inp" id="nameEdit" placeholder="Имя воина" style="display:none;font-size:16px;font-weight:600" onblur="saveName()" onkeydown="if(event.key==='Enter')this.blur()">
+        <div class="warrior-rank" id="wRank">Новобранец</div>
+        <div class="warrior-goal">Путь: рекомпозиция тела</div>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="tile-v" id="tLevel">1</div><div class="tile-l">Ступень</div></div>
+      <div class="tile"><div class="tile-v" id="tStreak">0</div><div class="tile-l">Серия</div></div>
+      <div class="tile"><div class="tile-v" id="tWeight">—</div><div class="tile-l">Вес</div></div>
+      <div class="tile"><div class="tile-v" id="tTrials">0</div><div class="tile-l">Битв</div></div>
+      <div class="tile"><div class="tile-v" id="tBooks">0</div><div class="tile-l">Трактатов</div></div>
+      <div class="tile"><div class="tile-v" id="tGoals">0</div><div class="tile-l">Целей</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Добродетели</span></div>
+    <div class="tiles" id="virtues"></div>
+  </div>
+
+  <div class="card" id="punishCard" style="display:none;border-color:rgba(228,87,61,0.3)">
+    <div class="card-head"><span class="card-label" style="color:var(--danger)">Незакрытая кара</span></div>
+    <div style="font-family:'Archivo',sans-serif;font-size:17px;font-weight:700;color:var(--danger)" id="pTask">—</div>
+    <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:8px 0 14px" id="pDesc">—</p>
+    <button class="btn warn wide" onclick="verifyPunishment()">Кара исполнена · +20</button>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Оформление</span></div>
+    <div class="swatches">
+      <div class="sw s1" data-t="" onclick="setTheme(this)"></div>
+      <div class="sw s2" data-t="t-bronze" onclick="setTheme(this)"></div>
+      <div class="sw s3" data-t="t-olive" onclick="setTheme(this)"></div>
+      <div class="sw s4" data-t="t-steel" onclick="setTheme(this)"></div>
+      <div class="sw s5" data-t="t-obsidian" onclick="setTheme(this)"></div>
+      <div class="sw s6" data-t="t-ash" onclick="setTheme(this)"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Летопись деяний</span></div>
+    <div id="histList"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Данные</span></div>
+    <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:12px">Сохрани прогресс в файл, чтобы не потерять его при смене устройства.</p>
+    <div class="btn-row">
+      <button class="btn sm" onclick="exportData()">Сохранить в файл</button>
+      <button class="btn sm" onclick="document.getElementById('impFile').click()">Восстановить</button>
+      <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+    <div style="height:1px;background:var(--line);margin:16px 0"></div>
+    <button class="btn warn sm" onclick="testPunishment()" style="margin-bottom:10px">Проверить кару</button>
+    <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:11px">Полное стирание уничтожит весь путь. Вернуть будет нельзя.</p>
+    <button class="btn warn sm" onclick="resetAll()">Стереть всё</button>
+  </div>
+</section>
+
+<!-- ============ ПРОВИЗИЯ ============ -->
+<section class="view" id="v-food">
+  <div class="view-head">
+    <h1 class="view-title">Провизия</h1>
+    <p class="view-note">Выбери день и запиши, что съел. Норма считается под рекомпозицию.</p>
+  </div>
+
+  <div class="card">
+    <div class="week-nav">
+      <button class="wk-arrow" onclick="shiftWeek(-1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="week-lbl" id="weekLbl">—</span>
+      <button class="wk-arrow" onclick="shiftWeek(1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="week-strip" id="weekStrip"></div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-ring">
+      <svg width="78" height="78" viewBox="0 0 78 78">
+        <circle cx="39" cy="39" r="33" fill="none" stroke="var(--surface-3)" stroke-width="6"/>
+        <circle id="kcalRing" cx="39" cy="39" r="33" fill="none" stroke="var(--accent)" stroke-width="6"
+                stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="207.3"
+                style="transition:stroke-dashoffset .55s cubic-bezier(.34,1.3,.64,1)"/>
+      </svg>
+      <div class="hero-ring-txt"><div class="hero-pct" id="kcalNow">0</div></div>
+    </div>
+    <div class="hero-body">
+      <div class="hero-title" id="kcalTitle">Ничего не записано</div>
+      <div class="hero-line" id="kcalLine">Норма: <span id="kcalGoal">2400</span> ккал</div>
+      <div class="macro-row" id="macroRow"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-label" id="dayLbl">День</span>
+      <button class="btn sm" onclick="clearDay()">Очистить день</button>
+    </div>
+    <div id="mealsBox"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">По неделям</span></div>
+    <div id="weekStats"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-label">Мои блюда</span>
+      <span class="tag" id="foodCount">0</span>
+    </div>
+    <div class="drawer" id="dFood">
+      <div class="drawer-in">
+        <input class="inp" id="fName" placeholder="Название блюда">
+        <select class="inp" id="fPer">
+          <option value="100">КБЖУ на 100 г</option>
+          <option value="1">КБЖУ за порцию / штуку</option>
+        </select>
+        <div class="field-pair">
+          <input class="inp" id="fK" type="number" placeholder="Ккал" inputmode="decimal">
+          <input class="inp" id="fP" type="number" placeholder="Белки" inputmode="decimal">
+        </div>
+        <div class="field-pair">
+          <input class="inp" id="fF" type="number" placeholder="Жиры" inputmode="decimal">
+          <input class="inp" id="fC" type="number" placeholder="Углеводы" inputmode="decimal">
+        </div>
+        <button class="btn fill wide" onclick="addFood()">Сохранить блюдо</button>
+      </div>
+    </div>
+    <button class="btn wide sm" onclick="drawer('dFood')" style="margin-bottom:12px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Добавить блюдо
+    </button>
+    <div id="foodLib"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Норма</span></div>
+    <div class="field-pair">
+      <input class="inp" id="wIn" placeholder="Вес в кг" inputmode="decimal">
+      <button class="btn fill" onclick="calcFood()" style="white-space:nowrap">Считать</button>
+    </div>
+    <div id="foodOut" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Снадобья</span></div>
+    <div class="supps">
+      <div class="supp"><div class="supp-n">Протеин</div><div class="supp-d">1–2 порции в день</div></div>
+      <div class="supp"><div class="supp-n">Креатин</div><div class="supp-d">5 г ежедневно</div></div>
+      <div class="supp"><div class="supp-n">Цитруллин</div><div class="supp-d">6–8 г перед боем</div></div>
+      <div class="supp"><div class="supp-n">Бета-аланин</div><div class="supp-d">3–4 г в день</div></div>
+      <div class="supp"><div class="supp-n">Изотоник</div><div class="supp-d">Во время боя</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ЛЕТОПИСЬ ============ -->
+<section class="view" id="v-chron">
+  <div class="view-head">
+    <h1 class="view-title">Летопись</h1>
+    <p class="view-note">Записывай раз в неделю — так видно настоящую динамику, а не суточные колебания.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Новая запись</span></div>
+    <div class="field-pair" style="margin-bottom:10px">
+      <input class="inp" id="wLog" placeholder="Вес, кг" inputmode="decimal">
+      <input class="inp" id="pLog" placeholder="Подтягивания" inputmode="numeric">
+    </div>
+    <button class="btn fill wide" onclick="logProgress()">Записать</button>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Вес</span></div>
+    <div class="chart-box"><canvas id="wChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Подтягивания</span></div>
+    <div class="chart-box"><canvas id="pChart"></canvas></div>
+  </div>
+</section>
+
+<!-- ============ ЗАКОНЫ ============ -->
+<section class="view" id="v-laws">
+  <div class="view-head"><h1 class="view-title">Законы</h1></div>
+
+  <div class="card">
+    <div class="creed">Со щитом<br>или на щите</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Как это устроено</span></div>
+    <div class="note">
+      <div class="note-t">Доблесть и ступени</div>
+      <p>Каждое исполненное дело приносит доблесть. Набрал 100 — поднялся на ступень, все добродетели выросли на единицу. На ступенях 10, 20, 50 и 100 открывается особое испытание духа.</p>
+    </div>
+    <div class="note">
+      <div class="note-t">Кара Ареса</div>
+      <p>Когда все долги дня отмечены и хотя бы один провален — приходит кара: удвоенная нагрузка и минус 10 доблести. Выполни её и подтверди во вкладке Воин, вернёшь 20.</p>
+    </div>
+    <div class="note">
+      <div class="note-t">Серия</div>
+      <p>Долги обновляются в полночь. Серия растёт только в дни, когда исполнено всё до конца. Один пропуск обнуляет счёт.</p>
+    </div>
+    <div class="note">
+      <div class="note-t">Свой путь</div>
+      <p>Долги, испытания, трактаты и цели можно добавлять и удалять. Система подстраивается под тебя, а не наоборот.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Звания</span></div>
+    <table class="tbl">
+      <tr><th>Звание</th><th>Ступень</th><th>Что это значит</th></tr>
+      <tr><td>Новобранец</td><td>1–14</td><td>Тело ещё не знает дисциплины</td></tr>
+      <tr><td>Воин</td><td>15–24</td><td>Привычка закалилась, нагрузка привычна</td></tr>
+      <tr><td>Гоплит</td><td>25–34</td><td>Держишь строй, дисциплина стала природой</td></tr>
+      <tr><td>Спартанец</td><td>35–49</td><td>Форма заметно выше обычного человека</td></tr>
+      <tr><td>Стратег</td><td>50–64</td><td>Ведёшь себя сам, рекомпозиция достигнута</td></tr>
+      <tr><td>Царь</td><td>65–99</td><td>Вершина пути</td></tr>
+      <tr><td>Легенда</td><td>100+</td><td>Ты превзошёл систему</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="card-label">Откуда доблесть</span></div>
+    <table class="tbl">
+      <tr><th>Дело</th><th>Доблесть</th></tr>
+      <tr><td>Долг тела</td><td>+9…15</td></tr>
+      <tr><td>Долг дисциплины</td><td>+5</td></tr>
+      <tr><td>Испытание целиком</td><td>+35</td></tr>
+      <tr><td>Чтение</td><td>+10</td></tr>
+      <tr><td>Трактат освоен</td><td>+40</td></tr>
+      <tr><td>Цель достигнута</td><td>+50</td></tr>
+      <tr><td>Кара исполнена</td><td>+20</td></tr>
+      <tr><td>Кара назначена</td><td>−10</td></tr>
+      <tr><td>Долг провален</td><td>−3…5</td></tr>
+    </table>
+  </div>
+</section>
+
+</div><!-- /shell -->
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="nav-in">
+    <button class="nav-btn on" data-v="duties" onclick="go('duties',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span>Долг</span>
+    </button>
+    <button class="nav-btn" data-v="trials" onclick="go('trials',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7 1 1-7 7zM14 21l7-7-1-1-7 7z"/></svg>
+      <span>Бой</span>
+    </button>
+    <button class="nav-btn" data-v="goals" onclick="go('goals',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>
+      <span>Цели</span>
+    </button>
+    <button class="nav-btn" data-v="codex" onclick="go('codex',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      <span>Трактаты</span>
+    </button>
+    <button class="nav-btn" id="moreBtn" onclick="openSheet()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>
+      <span>Воин</span>
+      <div class="nav-dot" id="navDot" style="display:none"></div>
+    </button>
+  </div>
+</nav>
+
+<!-- ============ SHEET ============ -->
+<div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-grip"></div>
+  <button class="sheet-item" onclick="go('warrior');closeSheet()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>
+    Воин
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <button class="sheet-item" onclick="go('food');closeSheet()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7a3 3 0 006 0V2M6 9v13M18 2a4 4 0 00-4 4v6h4v10"/></svg>
+    Провизия
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <button class="sheet-item" onclick="go('chron');closeSheet()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+    Летопись
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <button class="sheet-item" onclick="go('laws');closeSheet()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 8-4.5-.5-8-3-8-8V7z"/></svg>
+    Законы
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+</div>
+
+<!-- ============ FOOD PICKER ============ -->
+<div class="sheet-bg" id="pickBg" onclick="closePicker()"></div>
+<div class="picker" id="picker">
+  <div class="picker-top">
+    <div class="sheet-grip"></div>
+    <div class="picker-ttl" id="pickTtl">Что добавить</div>
+    <input class="inp" id="pickSearch" placeholder="Поиск блюда" oninput="renderPicker()" style="margin-bottom:11px">
+  </div>
+  <div class="picker-list" id="pickList"></div>
+</div>
+
+<!-- ============ MODALS ============ -->
+<div class="modal-bg" id="punishBg">
+  <div class="modal punish">
+    <div class="modal-mark">⚔</div>
+    <div class="modal-t">Кара Ареса</div>
+    <div class="modal-s">Долг не исполнен — слабость искупается делом</div>
+    <div class="modal-task">
+      <div class="modal-task-n" id="mTask">—</div>
+      <div class="modal-task-d" id="mDesc">—</div>
+    </div>
+    <button class="btn warn wide" onclick="acceptPunishment()">Принять кару</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="eventBg">
+  <div class="modal honor">
+    <div class="modal-mark" id="eIcon">🛡</div>
+    <div class="modal-t" id="eTitle">Испытание</div>
+    <div class="modal-s" id="eLevel">Ступень 10</div>
+    <div class="modal-body" id="eBody">—</div>
+    <button class="btn fill wide" onclick="closeEvent()">Принимаю</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ SOUND ============ */
+let _ac=null;
+function ac(){if(!_ac){try{_ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}if(_ac.state==="suspended")_ac.resume();return _ac;}
+function tn(f,t,d,v,t0){const c=ac();if(!c)return;t0=(t0||0)+c.currentTime;v=v||0.12;const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=t||"sine";o.frequency.value=f;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+.015);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.start(t0);o.stop(t0+d+.05);}
+const S={
+  tick(){tn(660,"sine",.09,.11);tn(880,"sine",.13,.09,.07);},
+  full(){[523,659,784,1047].forEach((f,i)=>tn(f,"triangle",.2,.12,i*.09));},
+  up(){[330,415,523,659].forEach((f,i)=>tn(f,"triangle",.22,.1,i*.08));tn(880,"sine",.45,.13,.4);},
+  go(){tn(147,"sawtooth",.12,.13);tn(196,"sawtooth",.14,.12,.11);tn(262,"triangle",.2,.11,.24);},
+  win(){[262,330,392].forEach(f=>tn(f,"triangle",.35,.1));tn(523,"triangle",.45,.13,.18);},
+  page(){tn(740,"sine",.07,.08);tn(988,"sine",.1,.07,.07);},
+  goal(){[392,494,587,784,988].forEach((f,i)=>tn(f,"triangle",.3,.12,i*.1));},
+  ok(){tn(440,"sine",.07,.07);tn(587,"sine",.09,.06,.07);},
+  no(){tn(120,"square",.18,.12);},
+  hit(){tn(80,"sawtooth",.18,.15);tn(60,"square",.3,.13,.16);},
+  epic(){[262,330,392,523,659].forEach((f,i)=>tn(f,"triangle",.45,.12,i*.13));}
+};
+
+/* ============ DATA ============ */
+const D_QUESTS=[
+  {label:"Отжимания — 30",xp:12,group:"Тело"},
+  {label:"Приседания — 40",xp:12,group:"Тело"},
+  {label:"Пресс — 30",xp:12,group:"Тело"},
+  {label:"Планка — 60 сек",xp:10,group:"Тело"},
+  {label:"8000 шагов",xp:15,group:"Тело"},
+  {label:"Вода — 2.5 л",xp:9,group:"Тело"},
+  {label:"Чистка зубов утром и вечером",xp:5,group:"Дисциплина"},
+  {label:"Умывание",xp:5,group:"Дисциплина"},
+  {label:"Средство на лицо",xp:5,group:"Дисциплина"}
+];
+const D_BOOKS=[
+  {title:"Аристотель — Политика",pages:320},
+  {title:"Платон — Государство",pages:360},
+  {title:"Макиавелли — Государь",pages:160},
+  {title:"Ленин — Государство и революция",pages:160},
+  {title:"Киссинджер — Мировой порядок",pages:432}
+];
+const D_TRIALS=[
+  {name:"Грудь и плечи",exercises:["Отжимания 4×12","Жим гантелей лёжа 4×10","Разведения гантелей 3×12","Жим гантелей вверх 4×10","Планка 3×1 мин"],custom:false},
+  {name:"Спина",exercises:["Подтягивания 4×максимум","Тяга штанги к поясу 4×10","Тяга гантели одной рукой 3×10","Обратные отжимания 3×12","Пресс 3×20"],custom:false},
+  {name:"Ноги",exercises:["Присед со штангой 4×12","Выпады 3×10","Румынская тяга 4×10","Подъёмы на носки 4×15","Планка 3×1 мин"],custom:false},
+  {name:"Фаланга — всё тело",exercises:["Подтягивания 4×максимум","Отжимания 4×15","Приседания 4×15","Жим гантелей 3×12","Пресс 3×25"],custom:false}
+];
+const PUNISH=[
+  {task:"Отжимания — 60",desc:"Шестьдесят отжиманий. Разбей на подходы, но доведи до конца."},
+  {task:"Приседания — 80",desc:"Восемьдесят приседаний. Техника важнее скорости."},
+  {task:"Пресс — 60",desc:"Шестьдесят подъёмов корпуса без остановки на жалость к себе."},
+  {task:"Планка — 3 минуты",desc:"Три минуты суммарно. Дрожь — не повод опускаться."},
+  {task:"Выпады — 40",desc:"Двадцать на каждую ногу. Следи за равновесием и глубиной."},
+  {task:"Берпи — 40",desc:"Сорок берпи. Дыхание собьётся — это часть кары."}
+];
+const EVENTS={
+  10:{icon:"📜",t:"Скрижаль воина",b:`Ступень 10 достигнута.\n\nЗаведи бумажный дневник. Записывай каждое испытание от руки: дату, упражнения, состояние тела и духа.\n\nСпартанцы высекали имена на камне. Ты пишешь свой путь на бумаге — то, что нельзя стереть одним нажатием.`},
+  20:{icon:"🧊",t:"Закалка Еврота",b:`Ступень 20.\n\nСпартанские юноши купались в ледяной реке круглый год.\n\nТвоя закалка: контрастный душ каждое утро. Минута горячей воды, тридцать секунд ледяной, три круга. Сосуды, иммунитет, воля.`},
+  50:{icon:"🦉",t:"Молчание Афины",b:`Ступень 50. Половина пути к вершине пройдена.\n\nСила без ясного ума — просто мясо.\n\nДесять минут тишины каждое утро. Сядь, закрой глаза. Вдох на четыре, задержка на четыре, выдох на четыре. Разум — тоже мышца.`},
+  100:{icon:"🔥",t:"Фермопилы",b:`Ступень 100.\n\nТы не тот, кто начинал. Тело перековано, воля закалена, привычка стала природой.\n\nПоследнее дело: напиши письмо себе прежнему. Расскажи, кем ты стал и что далось тяжелее всего. Запечатай. Открой через год.`}
+};
+const D_FOODS=[
+  {n:"Куриное филе",k:165,p:31,f:3.6,c:0,per:"100"},
+  {n:"Минтай",k:72,p:15.9,f:0.9,c:0,per:"100"},
+  {n:"Рис варёный",k:130,p:2.7,f:0.3,c:28,per:"100"},
+  {n:"Гречка варёная",k:92,p:3.4,f:0.6,c:20,per:"100"},
+  {n:"Овсянка сухая",k:366,p:12,f:6,c:62,per:"100"},
+  {n:"Творог 5%",k:121,p:17,f:5,c:3,per:"100"},
+  {n:"Яйцо",k:78,p:6.3,f:5.3,c:0.6,per:"1"},
+  {n:"Банан",k:89,p:1.1,f:0.3,c:23,per:"100"},
+  {n:"Яблоко",k:52,p:0.3,f:0.2,c:14,per:"100"},
+  {n:"Огурец",k:15,p:0.8,f:0.1,c:3.6,per:"100"},
+  {n:"Помидор",k:18,p:0.9,f:0.2,c:3.9,per:"100"},
+  {n:"Протеин",k:120,p:24,f:1.5,c:3,per:"1"},
+  {n:"Зефир",k:326,p:0.8,f:0.1,c:80,per:"100"},
+  {n:"Шоколад горький",k:546,p:6.2,f:35,c:48,per:"100"},
+  {n:"Масло оливковое",k:884,p:0,f:100,c:0,per:"100"}
+];
+const RANKS=[{n:"Легенда",m:100},{n:"Царь",m:65},{n:"Стратег",m:50},{n:"Спартанец",m:35},{n:"Гоплит",m:25},{n:"Воин",m:15},{n:"Новобранец",m:1}];
+const GORDER=["Тело","Дисциплина","Разум"];
+
+let d=JSON.parse(localStorage.getItem("agoge"))||JSON.parse(localStorage.getItem("spartanProtocol"))||null;
+if(!d){
+  d={level:1,xp:0,rank:"Новобранец",str:5,end:5,ath:5,fat:5,int:5,
+     streak:0,lastReset:null,
+     questList:D_QUESTS.map(q=>({...q,done:false,failed:false})),
+     questsCompletedTotal:0,
+     bookList:D_BOOKS.map(b=>({...b})),book:0,bookPage:0,booksRead:[],
+     trialList:D_TRIALS.map(t=>({...t})),trialsCount:0,trialLog:[],
+     goals:[],weights:[],pulls:[],history:[],
+     foods:D_FOODS.map(f=>({...f})),diary:{},norm:{k:2400,p:150,f:80,c:270},
+     theme:"",playerName:"",avatarImg:"",punishment:null,seenEvents:[]};
+}
+if(!Array.isArray(d.foods)||!d.foods.length)d.foods=D_FOODS.map(f=>({...f}));
+if(!d.diary||typeof d.diary!=="object")d.diary={};
+if(!d.norm)d.norm={k:2400,p:150,f:80,c:270};
+if(!Array.isArray(d.questList)||!d.questList.length)d.questList=D_QUESTS.map(q=>({...q,done:false,failed:false}));
+if(!Array.isArray(d.bookList)||!d.bookList.length)d.bookList=D_BOOKS.map(b=>({...b}));
+if(!Array.isArray(d.trialList)||!d.trialList.length)d.trialList=D_TRIALS.map(t=>({...t}));
+["goals","seenEvents","trialLog","history","weights","pulls","booksRead"].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[];});
+
+let exState=[],trialOn=false;
+const save=()=>localStorage.setItem("agoge",JSON.stringify(d));
+
+/* ============ UI HELPERS ============ */
+function toast(msg,kind){
+  const el=document.getElementById("toast");
+  el.textContent=msg;el.className="toast show"+(kind?" "+kind:"");
+  clearTimeout(el._t);el._t=setTimeout(()=>el.className="toast",2300);
+}
+function drawer(id){document.getElementById(id).classList.toggle("open");}
+function hist(msg){d.history.unshift({msg,date:new Date().toLocaleDateString("ru")});if(d.history.length>40)d.history.pop();}
+const ICON_TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>';
+const ICON_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+const ICON_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+
+/* ============ XP ============ */
+function addXP(n){
+  d.xp+=n;
+  while(d.xp>=100){
+    d.xp-=100;d.level++;
+    d.str++;d.end++;d.ath++;d.fat++;
+    rank();
+    if(d.level===100){toast("Ты — Легенда","good");setTimeout(legendEvent,900);}
+    else toast("Ступень "+d.level,"good");
+    S.up();hist("Достигнута ступень "+d.level);
+    if(EVENTS[d.level]&&!d.seenEvents.includes(d.level))setTimeout(()=>showEvent(d.level),1400);
+  }
+  save();render();
+}
+function loseXP(n){d.xp=Math.max(0,d.xp-n);save();render();}
+function rank(){for(const r of RANKS){if(d.level>=r.m){d.rank=r.n;return;}}d.rank="Новобранец";}
+
+/* ============ EVENTS ============ */
+function showEvent(l){
+  const e=EVENTS[l];if(!e)return;
+  document.getElementById("eIcon").textContent=e.icon;
+  document.getElementById("eTitle").textContent=e.t;
+  document.getElementById("eLevel").textContent="Ступень "+l;
+  document.getElementById("eBody").textContent=e.b;
+  document.getElementById("eventBg").classList.add("open");S.epic();
+}
+function legendEvent(){
+  document.getElementById("eIcon").textContent="🔥";
+  document.getElementById("eTitle").textContent="Легенда";
+  document.getElementById("eLevel").textContent="Ступень 100";
+  document.getElementById("eBody").textContent="Ты достиг сотой ступени.\n\nТвоё звание — Легенда.\n\nСистема больше не ведёт тебя. Ты ведёшь себя сам.\n\nСо щитом или на щите.";
+  document.getElementById("eventBg").classList.add("open");S.epic();hist("Получено звание Легенда");
+}
+function closeEvent(){
+  const l=parseInt(document.getElementById("eLevel").textContent.replace("Ступень ",""));
+  if(l&&!d.seenEvents.includes(l))d.seenEvents.push(l);
+  document.getElementById("eventBg").classList.remove("open");save();
+}
+
+/* ============ DAILY ============ */
+function resetDaily(){
+  const t=new Date().toDateString();
+  if(d.lastReset!==t){
+    if(d.lastReset){
+      const y=new Date();y.setDate(y.getDate()-1);
+      if(d.lastReset!==y.toDateString())d.streak=0;
+    }
+    d.questList.forEach(q=>{q.done=false;q.failed=false;});
+    d.lastReset=t;save();
+  }
+}
+
+/* ============ DUTIES ============ */
+function renderDuties(){
+  const box=document.getElementById("dutyList");box.innerHTML="";
+  const groups={};
+  d.questList.forEach((q,i)=>{(groups[q.group||"Тело"]=groups[q.group||"Тело"]||[]).push({q,i});});
+  const order=[...GORDER.filter(g=>groups[g]),...Object.keys(groups).filter(g=>!GORDER.includes(g))];
+  order.forEach(g=>{
+    const lbl=document.createElement("div");lbl.className="grp-name";lbl.textContent=g;box.appendChild(lbl);
+    groups[g].forEach(({q,i})=>{
+      const r=document.createElement("div");
+      r.className="row"+(q.done?" done":"")+(q.failed&&!q.done?" fail":"");
+      const t=document.createElement("div");t.className="row-txt";t.textContent=q.label;
+      const xp=document.createElement("div");xp.className="row-xp"+(q.failed&&!q.done?" neg":"");
+      xp.textContent=q.failed&&!q.done?"−":"+"+q.xp;
+      const acts=document.createElement("div");acts.className="row-acts";
+      if(!q.done&&!q.failed){
+        const ok=document.createElement("button");ok.className="tick";ok.innerHTML=ICON_CHECK;ok.onclick=()=>doQuest(i);
+        const no=document.createElement("button");no.className="cross";no.innerHTML=ICON_X;no.onclick=()=>failQuest(i);
+        acts.append(ok,no);
+      }else{
+        const s=document.createElement("div");s.className="tick"+(q.done?" on":"");
+        if(!q.done){s.style.borderColor="rgba(228,87,61,.4)";s.style.color="var(--danger)";}
+        s.innerHTML=q.done?ICON_CHECK:ICON_X;s.style.pointerEvents="none";acts.append(s);
+      }
+      const del=document.createElement("button");del.className="icon-btn";del.innerHTML=ICON_TRASH;
+      del.onclick=()=>{if(confirm("Убрать этот долг?")){d.questList.splice(i,1);save();render();}};
+      acts.append(del);
+      r.append(t,xp,acts);box.appendChild(r);
+    });
+  });
+  // hero
+  const total=d.questList.length,done=d.questList.filter(q=>q.done).length;
+  const failed=d.questList.filter(q=>q.failed).length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById("dayPct").textContent=pct+"%";
+  document.getElementById("dayRing").style.strokeDashoffset=207.3-(207.3*pct/100);
+  document.getElementById("streakVal").textContent=d.streak;
+  document.getElementById("tagLevel").textContent=d.level;
+  const h=document.getElementById("heroTitle"),hl=document.getElementById("heroLine");
+  if(done===total&&total){h.textContent="Долг исполнен";hl.textContent="Весь день закрыт. Серия продолжается.";}
+  else if(failed){h.textContent="Есть провалы";hl.textContent=`Исполнено ${done} из ${total}, провалено ${failed}.`;}
+  else{h.textContent="Долг ждёт";hl.textContent=`Исполнено ${done} из ${total}. Осталось ${total-done}.`;}
+  document.getElementById("todayDate").textContent=new Date().toLocaleDateString("ru",{weekday:"long",day:"numeric",month:"long"});
+}
+function doQuest(i){
+  const q=d.questList[i];if(!q||q.done||q.failed)return;
+  q.done=true;d.questsCompletedTotal++;
+  addXP(q.xp);toast("Исполнено · +"+q.xp,"good");S.tick();
+  if(d.questList.every(x=>x.done)){
+    setTimeout(()=>{d.streak++;toast("Весь долг закрыт · серия "+d.streak,"good");S.full();hist("Полный день долга, серия "+d.streak);save();render();},2400);
+  }
+  save();render();
+}
+function failQuest(i){
+  const q=d.questList[i];if(!q||q.done||q.failed)return;
+  q.failed=true;
+  const loss=q.group==="Тело"?5:3;
+  loseXP(loss);toast("Провалено · −"+loss,"bad");S.no();
+  const acted=d.questList.every(x=>x.done||x.failed);
+  if(acted&&d.questList.some(x=>x.failed)&&!d.punishment){
+    const p=PUNISH[Math.floor(Math.random()*PUNISH.length)];
+    d.punishment={task:p.task,desc:p.desc,date:new Date().toLocaleDateString("ru")};
+    loseXP(10);
+    setTimeout(()=>{
+      document.getElementById("mTask").textContent=p.task;
+      document.getElementById("mDesc").textContent=p.desc;
+      document.getElementById("punishBg").classList.add("open");S.hit();
+    },700);
+  }
+  save();render();
+}
+function addQuest(){
+  const l=document.getElementById("qLabel").value.trim();
+  const x=parseInt(document.getElementById("qXP").value)||10;
+  const g=document.getElementById("qGroup").value;
+  if(!l){toast("Напиши, что нужно делать","bad");S.no();return;}
+  d.questList.push({label:l,xp:x,group:g,done:false,failed:false});
+  document.getElementById("qLabel").value="";document.getElementById("qXP").value="10";
+  drawer("dQuest");save();render();toast("Долг добавлен","good");S.ok();
+}
+
+/* ============ PUNISHMENT ============ */
+function acceptPunishment(){document.getElementById("punishBg").classList.remove("open");toast("Кара принята");save();render();}
+function verifyPunishment(){
+  if(!d.punishment)return;
+  hist("Кара исполнена: "+d.punishment.task);
+  d.punishment=null;save();addXP(20);toast("Кара исполнена · +20","good");S.win();render();
+}
+function testPunishment(){
+  const p=PUNISH[Math.floor(Math.random()*PUNISH.length)];
+  document.getElementById("mTask").textContent=p.task;
+  document.getElementById("mDesc").textContent=p.desc;
+  document.getElementById("punishBg").classList.add("open");S.hit();
+}
+function renderPunish(){
+  const c=document.getElementById("punishCard"),dot=document.getElementById("navDot");
+  if(d.punishment){
+    c.style.display="block";dot.style.display="block";
+    document.getElementById("pTask").textContent=d.punishment.task;
+    document.getElementById("pDesc").textContent=d.punishment.desc;
+  }else{c.style.display="none";dot.style.display="none";}
+}
+
+/* ============ TRIALS ============ */
+function renderTrialPick(){
+  const s=document.getElementById("trialPick"),prev=s.value;
+  s.innerHTML=d.trialList.map((t,i)=>`<option value="${i}">${t.name}</option>`).join("");
+  if(prev&&d.trialList[prev])s.value=prev;
+}
+function startTrial(){
+  const i=parseInt(document.getElementById("trialPick").value),t=d.trialList[i];if(!t)return;
+  const box=document.getElementById("trialBox");
+  exState=t.exercises.map(()=>false);trialOn=true;box.innerHTML="";
+  t.exercises.forEach((ex,n)=>{
+    const row=document.createElement("div");row.className="ex";
+    const b=document.createElement("button");b.className="tick";b.innerHTML=ICON_CHECK;
+    b.onclick=()=>{exState[n]=!exState[n];row.classList.toggle("on",exState[n]);b.classList.toggle("on",exState[n]);if(exState[n])S.tick();};
+    const s=document.createElement("div");s.className="ex-t";s.textContent=ex;
+    row.append(b,s);box.appendChild(row);
+  });
+  toast("В бой · "+t.name);S.go();
+}
+function endTrial(){
+  if(!trialOn){toast("Сначала начни испытание","bad");S.no();return;}
+  const done=exState.filter(Boolean).length,total=exState.length;
+  const xp=done>=total?35:Math.round(35*done/total);
+  const i=parseInt(document.getElementById("trialPick").value),t=d.trialList[i];
+  d.trialsCount++;
+  d.trialLog.unshift({date:new Date().toLocaleDateString("ru"),name:t.name,done,total});
+  if(d.trialLog.length>12)d.trialLog.pop();
+  hist("Испытание: "+t.name+" ("+done+"/"+total+")");
+  addXP(xp);toast("Испытание пройдено · +"+xp,"good");S.win();
+  trialOn=false;document.getElementById("trialBox").innerHTML="";render();
+}
+function renderTrialLog(){
+  const c=document.getElementById("trialLog");
+  c.innerHTML=d.trialLog.length
+    ?d.trialLog.slice(0,6).map(r=>`<div class="log"><div class="log-t">${r.name}</div><div class="log-d">${r.date} · ${r.done}/${r.total}</div></div>`).join("")
+    :`<div class="empty"><div class="empty-icon">⚔</div><div class="empty-txt">Битв ещё не было.<br>Начни первое испытание.</div></div>`;
+}
+function renderCustomTrials(){
+  const c=document.getElementById("customTrials");
+  const list=d.trialList.map((t,i)=>({t,i})).filter(x=>x.t.custom);
+  if(!list.length){c.innerHTML=`<div class="empty"><div class="empty-txt">Пока только базовые испытания.<br>Создай своё под свой инвентарь.</div></div>`;return;}
+  c.innerHTML="";
+  list.forEach(({t,i})=>{
+    const row=document.createElement("div");row.className="item";
+    row.innerHTML=`<div class="item-body"><div class="item-t">${t.name}</div><div class="item-s">${t.exercises.length} упражнений</div></div>`;
+    const del=document.createElement("button");del.className="icon-btn";del.innerHTML=ICON_TRASH;
+    del.onclick=()=>{if(confirm("Удалить испытание?")){d.trialList.splice(i,1);save();render();}};
+    row.appendChild(del);c.appendChild(row);
+  });
+}
+function addTrial(){
+  const n=document.getElementById("tName").value.trim();
+  const raw=document.getElementById("tEx").value.trim();
+  if(!n||!raw){toast("Заполни название и упражнения","bad");S.no();return;}
+  const ex=raw.split(";").map(s=>s.trim()).filter(Boolean);
+  if(!ex.length){toast("Добавь хотя бы одно упражнение","bad");S.no();return;}
+  d.trialList.push({name:n,exercises:ex,custom:true});
+  document.getElementById("tName").value="";document.getElementById("tEx").value="";
+  drawer("dTrial");save();render();toast("Испытание создано","good");S.ok();
+}
+
+/* ============ GOALS ============ */
+function renderGoals(){
+  const open=document.getElementById("goalsOpen"),done=document.getElementById("goalsDone");
+  const a=d.goals.map((g,i)=>({g,i})).filter(x=>!x.g.done);
+  const b=d.goals.filter(g=>g.done);
+  open.innerHTML="";
+  if(!a.length)open.innerHTML=`<div class="empty"><div class="empty-icon">◎</div><div class="empty-txt">Целей пока нет.<br>Назови рубеж, к которому идёшь.</div></div>`;
+  a.forEach(({g,i})=>{
+    const row=document.createElement("div");row.className="item";
+    const btn=document.createElement("button");btn.className="tick";btn.innerHTML=ICON_CHECK;btn.onclick=()=>doGoal(i);
+    const body=document.createElement("div");body.className="item-body";
+    let sub="";
+    if(g.deadline){
+      const dt=new Date(g.deadline),left=Math.ceil((dt-new Date())/864e5);
+      sub=`<div class="item-s${left<0?" late":""}">${dt.toLocaleDateString("ru")} · ${left>=0?"осталось "+left+" дн.":"срок вышел"}</div>`;
+    }
+    body.innerHTML=`<div class="item-t">${g.text}</div>${sub}`;
+    const del=document.createElement("button");del.className="icon-btn";del.innerHTML=ICON_TRASH;
+    del.onclick=()=>{if(confirm("Удалить цель?")){d.goals.splice(i,1);save();render();}};
+    row.append(btn,body,del);open.appendChild(row);
+  });
+  done.innerHTML=b.length
+    ?b.map(g=>`<div class="item done"><div class="item-body"><div class="item-t">${g.text}</div></div></div>`).join("")
+    :`<div class="empty"><div class="empty-txt">Здесь появятся взятые рубежи.</div></div>`;
+}
+function addGoal(){
+  const t=document.getElementById("gText").value.trim();
+  const dt=document.getElementById("gDate").value;
+  if(!t){toast("Опиши цель","bad");S.no();return;}
+  d.goals.push({text:t,deadline:dt||null,done:false,created:new Date().toLocaleDateString("ru")});
+  document.getElementById("gText").value="";document.getElementById("gDate").value="";
+  drawer("dGoal");save();render();toast("Цель поставлена","good");S.ok();
+}
+function doGoal(i){
+  const g=d.goals[i];if(!g||g.done)return;
+  g.done=true;hist("Цель достигнута: "+g.text);
+  addXP(50);toast("Цель взята · +50","good");S.goal();save();render();
+}
+
+/* ============ BOOKS ============ */
+const pps=()=>20+Math.floor(d.streak/7)*5;
+function renderBooks(){
+  if(d.book>=d.bookList.length)d.book=0;
+  const b=d.bookList[d.book],box=document.getElementById("bookNow");
+  if(!b){box.innerHTML=`<div class="empty"><div class="empty-txt">Библиотека пуста. Добавь трактат.</div></div>`;}
+  else{
+    const pct=Math.min(100,Math.round(d.bookPage/b.pages*100));
+    document.getElementById("pps").textContent=pps();
+    box.innerHTML=`
+      <div style="font-family:'Archivo',sans-serif;font-size:17px;font-weight:600;line-height:1.35;letter-spacing:-0.2px">${b.title}</div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin:11px 0 8px">
+        <span style="font-size:12.5px;color:var(--text-2)">Страница ${d.bookPage} из ${b.pages}</span>
+        <span style="font-family:'Archivo',sans-serif;font-size:15px;font-weight:700;color:var(--accent)">${pct}%</span>
+      </div>
+      <div class="meter"><div class="meter-fill" style="width:${pct}%"></div></div>`;
+  }
+  const lib=document.getElementById("library");lib.innerHTML="";
+  d.bookList.forEach((bk,i)=>{
+    const row=document.createElement("div");row.className="item"+(i===d.book?" active":"");
+    const body=document.createElement("div");body.className="item-body";
+    body.innerHTML=`<div class="item-t">${bk.title}</div><div class="item-s">${bk.pages} стр.${i===d.book?" · читается":""}</div>`;
+    body.onclick=()=>{d.book=i;d.bookPage=0;save();render();toast("Трактат выбран");};
+    row.appendChild(body);
+    if(d.bookList.length>1){
+      const del=document.createElement("button");del.className="icon-btn";del.innerHTML=ICON_TRASH;
+      del.onclick=e=>{e.stopPropagation();if(confirm("Убрать из библиотеки?")){d.bookList.splice(i,1);if(d.book>=d.bookList.length)d.book=0;d.bookPage=0;save();render();}};
+      row.appendChild(del);
+    }
+    lib.appendChild(row);
+  });
+  document.getElementById("booksRead").innerHTML=d.booksRead.length
+    ?d.booksRead.map(t=>`<div class="log"><div class="log-t">${t}</div></div>`).join("")
+    :`<div class="empty"><div class="empty-txt">Ни один трактат ещё не дочитан.</div></div>`;
+}
+function addBook(){
+  const t=document.getElementById("bTitle").value.trim();
+  const p=parseInt(document.getElementById("bPages").value)||300;
+  if(!t){toast("Укажи название","bad");S.no();return;}
+  d.bookList.push({title:t,pages:p});
+  document.getElementById("bTitle").value="";document.getElementById("bPages").value="300";
+  drawer("dBook");save();render();toast("Трактат добавлен","good");S.ok();
+}
+function readPages(){
+  const b=d.bookList[d.book];if(!b)return;
+  d.bookPage=Math.min(b.pages,d.bookPage+pps());d.int++;
+  addXP(10);toast("Прочитано +"+pps()+" стр.","good");S.page();save();render();
+}
+function finishBook(){
+  const b=d.bookList[d.book];if(!b)return;
+  d.booksRead.push(b.title);hist("Трактат освоен: "+b.title);
+  d.book=(d.book+1)%d.bookList.length;d.bookPage=0;d.int+=3;
+  addXP(40);toast("Трактат освоен · +40","good");S.goal();save();render();
+}
+
+/* ============ FOOD DIARY ============ */
+const MEALS=[["b","Завтрак"],["l","Обед"],["d","Ужин"],["s","Перекус"]];
+const WD=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+let selDate=new Date(),weekOffset=0,pickMeal=null;
+
+const dkey=dt=>dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
+function monday(dt){const x=new Date(dt);const w=(x.getDay()+6)%7;x.setDate(x.getDate()-w);x.setHours(0,0,0,0);return x;}
+function dayEntry(k){if(!d.diary[k])d.diary[k]={b:[],l:[],d:[],s:[]};return d.diary[k];}
+function dayTotals(k){
+  const e=d.diary[k];const t={k:0,p:0,f:0,c:0};
+  if(!e)return t;
+  "blds".split("").forEach(m=>(e[m]||[]).forEach(x=>{t.k+=x.k;t.p+=x.p;t.f+=x.f;t.c+=x.c;}));
+  return t;
+}
+const mealKcal=(k,m)=>(d.diary[k]?.[m]||[]).reduce((s,x)=>s+x.k,0);
+
+function shiftWeek(n){weekOffset+=n;renderWeek();}
+function pickDay(dt){selDate=dt;renderFood();}
+
+function renderWeek(){
+  const base=monday(new Date());base.setDate(base.getDate()+weekOffset*7);
+  const strip=document.getElementById("weekStrip");strip.innerHTML="";
+  const todayK=dkey(new Date()),selK=dkey(selDate);
+  for(let i=0;i<7;i++){
+    const dt=new Date(base);dt.setDate(base.getDate()+i);
+    const k=dkey(dt),has=dayTotals(k).k>0;
+    const cell=document.createElement("div");
+    cell.className="day-cell"+(k===selK?" on":"")+(k===todayK?" today":"")+(has?" has":"");
+    cell.innerHTML=`<div class="day-w">${WD[i]}</div><div class="day-n">${dt.getDate()}</div><div class="day-dot"></div>`;
+    cell.onclick=()=>pickDay(dt);
+    strip.appendChild(cell);
+  }
+  const end=new Date(base);end.setDate(base.getDate()+6);
+  const mo=dt=>dt.toLocaleDateString("ru",{month:"short"});
+  document.getElementById("weekLbl").textContent=
+    weekOffset===0?"Эта неделя":`${base.getDate()} ${mo(base)} — ${end.getDate()} ${mo(end)}`;
+}
+
+function renderFood(){
+  if(!d.diary)d.diary={};
+  if(!d.norm)d.norm={k:2400,p:150,f:80,c:270};
+  renderWeek();
+  const k=dkey(selDate),t=dayTotals(k),n=d.norm;
+  const pct=n.k?Math.min(150,Math.round(t.k/n.k*100)):0;
+  document.getElementById("kcalNow").textContent=Math.round(t.k);
+  document.getElementById("kcalGoal").textContent=n.k;
+  document.getElementById("kcalRing").style.strokeDashoffset=207.3-(207.3*Math.min(pct,100)/100);
+  const left=n.k-Math.round(t.k);
+  const ttl=document.getElementById("kcalTitle"),line=document.getElementById("kcalLine");
+  if(t.k===0){ttl.textContent="Ничего не записано";line.textContent="Норма: "+n.k+" ккал";}
+  else if(left>0){ttl.textContent="Осталось "+left+" ккал";line.textContent="Съедено "+Math.round(t.k)+" из "+n.k;}
+  else{ttl.textContent="Перебор "+Math.abs(left)+" ккал";line.textContent="Съедено "+Math.round(t.k)+" из "+n.k;}
+  document.getElementById("macroRow").innerHTML=[
+    ["Б",t.p,n.p,"mf-p"],["Ж",t.f,n.f,"mf-f"],["У",t.c,n.c,"mf-c"]
+  ].map(([l,v,g,c])=>`<div class="macro">
+      <div class="macro-top"><span class="macro-n">${l}</span><span class="macro-v">${Math.round(v)}/${g}</span></div>
+      <div class="macro-bar"><div class="macro-fill ${c}" style="width:${g?Math.min(100,v/g*100):0}%"></div></div>
+    </div>`).join("");
+
+  document.getElementById("dayLbl").textContent=
+    selDate.toLocaleDateString("ru",{weekday:"long",day:"numeric",month:"long"});
+
+  const box=document.getElementById("mealsBox");box.innerHTML="";
+  MEALS.forEach(([m,name])=>{
+    const blk=document.createElement("div");blk.className="meal-block";
+    const head=document.createElement("div");head.className="meal-head";
+    head.innerHTML=`<span class="meal-name">${name}</span><span class="meal-kcal">${Math.round(mealKcal(k,m))} ккал</span>`;
+    const add=document.createElement("button");add.className="add-mini";
+    add.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+    add.onclick=()=>openPicker(m,name);
+    head.appendChild(add);blk.appendChild(head);
+    const items=d.diary[k]?.[m]||[];
+    if(!items.length){
+      const e=document.createElement("div");e.className="meal-empty";e.textContent="Пусто";blk.appendChild(e);
+    }
+    items.forEach((it,idx)=>{
+      const row=document.createElement("div");row.className="food-line";
+      row.innerHTML=`<div class="food-b"><div class="food-n">${it.n}</div>
+        <div class="food-m">${it.q}${it.u} · Б ${it.p.toFixed(1)} Ж ${it.f.toFixed(1)} У ${it.c.toFixed(1)}</div></div>
+        <div class="food-k">${Math.round(it.k)}</div>`;
+      const del=document.createElement("button");del.className="icon-btn";del.innerHTML=ICON_TRASH;
+      del.onclick=()=>{d.diary[k][m].splice(idx,1);save();renderFood();S.no();};
+      row.appendChild(del);blk.appendChild(row);
+    });
+    box.appendChild(blk);
+  });
+
+  renderFoodLib();renderWeekStats();
+}
+
+function clearDay(){
+  const k=dkey(selDate);
+  if(!d.diary[k]||dayTotals(k).k===0){toast("День и так пуст");return;}
+  if(!confirm("Убрать все записи за этот день?"))return;
+  delete d.diary[k];save();renderFood();toast("День очищен");S.ok();
+}
+
+/* --- picker --- */
+function openPicker(m,name){
+  pickMeal=m;
+  document.getElementById("pickTtl").textContent=name;
+  document.getElementById("pickSearch").value="";
+  renderPicker();
+  document.getElementById("pickBg").classList.add("open");
+  document.getElementById("picker").classList.add("open");
+}
+function closePicker(){
+  document.getElementById("pickBg").classList.remove("open");
+  document.getElementById("picker").classList.remove("open");
+}
+function renderPicker(){
+  const q=document.getElementById("pickSearch").value.trim().toLowerCase();
+  const list=document.getElementById("pickList");list.innerHTML="";
+  const found=d.foods.filter(f=>f.n.toLowerCase().includes(q));
+  if(!found.length){
+    list.innerHTML=`<div class="empty"><div class="empty-txt">Ничего не найдено.<br>Добавь блюдо в разделе «Мои блюда».</div></div>`;
+    return;
+  }
+  found.forEach(f=>{
+    const row=document.createElement("div");row.className="pick-row";
+    const unit=f.per==="1"?"порция":"100 г";
+    row.innerHTML=`<div class="pick-b"><div class="pick-n">${f.n}</div>
+      <div class="pick-m">${f.k} ккал · Б ${f.p} Ж ${f.f} У ${f.c} / ${unit}</div></div>`;
+    row.onclick=()=>eat(f);
+    list.appendChild(row);
+  });
+}
+function eat(f){
+  const per1=f.per==="1";
+  const ask=per1?"Сколько порций?":"Сколько грамм?";
+  const def=per1?"1":"100";
+  const raw=prompt(f.n+"\n"+ask,def);
+  if(raw===null)return;
+  const q=parseFloat(raw.replace(",","."));
+  if(!q||q<=0){toast("Нужно число больше нуля","bad");S.no();return;}
+  const mult=per1?q:q/100;
+  const k=dkey(selDate);
+  dayEntry(k)[pickMeal].push({
+    n:f.n,q,u:per1?" порц.":" г",
+    k:f.k*mult,p:f.p*mult,f:f.f*mult,c:f.c*mult
+  });
+  save();closePicker();renderFood();
+  toast(f.n+" · +"+Math.round(f.k*mult)+" ккал","good");S.tick();
+}
+
+/* --- food library --- */
+function renderFoodLib(){
+  const box=document.getElementById("foodLib");box.innerHTML="";
+  document.getElementById("foodCount").textContent=d.foods.length;
+  if(!d.foods.length){
+    box.innerHTML=`<div class="empty"><div class="empty-txt">Блюд пока нет.<br>Добавь то, что ешь регулярно.</div></div>`;
+    return;
+  }
+  d.foods.forEach((f,i)=>{
+    const row=document.createElement("div");row.className="item";
+    const unit=f.per==="1"?"порция":"100 г";
+    row.innerHTML=`<div class="item-body"><div class="item-t">${f.n}</div>
+      <div class="item-s">${f.k} ккал · Б ${f.p} Ж ${f.f} У ${f.c} / ${unit}</div></div>`;
+    const del=document.createElement("button");del.className="icon-btn";del.innerHTML=ICON_TRASH;
+    del.onclick=()=>{if(confirm("Удалить «"+f.n+"» из списка блюд?")){d.foods.splice(i,1);save();renderFood();}};
+    row.appendChild(del);box.appendChild(row);
+  });
+}
+function addFood(){
+  const n=document.getElementById("fName").value.trim();
+  const per=document.getElementById("fPer").value;
+  const num=id=>parseFloat(document.getElementById(id).value.replace(",","."))||0;
+  const k=num("fK"),p=num("fP"),f=num("fF"),c=num("fC");
+  if(!n){toast("Напиши название","bad");S.no();return;}
+  if(!k){toast("Укажи калорийность","bad");S.no();return;}
+  d.foods.push({n,k,p,f,c,per});
+  d.foods.sort((a,b)=>a.n.localeCompare(b.n,"ru"));
+  ["fName","fK","fP","fF","fC"].forEach(id=>document.getElementById(id).value="");
+  drawer("dFood");save();renderFood();toast("Блюдо сохранено","good");S.ok();
+}
+
+/* --- weekly stats --- */
+function renderWeekStats(){
+  const box=document.getElementById("weekStats");
+  const buckets={};
+  Object.keys(d.diary).forEach(k=>{
+    const t=dayTotals(k);if(t.k<=0)return;
+    const wk=dkey(monday(new Date(k)));
+    if(!buckets[wk])buckets[wk]={k:0,p:0,f:0,c:0,days:0};
+    const b=buckets[wk];b.k+=t.k;b.p+=t.p;b.f+=t.f;b.c+=t.c;b.days++;
+  });
+  const keys=Object.keys(buckets).sort().reverse().slice(0,6);
+  if(!keys.length){
+    box.innerHTML=`<div class="empty"><div class="empty-icon">◷</div><div class="empty-txt">Данных пока нет.<br>Запиши первый приём пищи.</div></div>`;
+    return;
+  }
+  const thisWk=dkey(monday(new Date()));
+  box.innerHTML=keys.map((wk,i)=>{
+    const b=buckets[wk];
+    const avg=Math.round(b.k/b.days);
+    const st=new Date(wk),en=new Date(wk);en.setDate(en.getDate()+6);
+    const mo=x=>x.toLocaleDateString("ru",{month:"short"});
+    const lbl=wk===thisWk?"Эта неделя":`${st.getDate()} ${mo(st)} — ${en.getDate()} ${mo(en)}`;
+    let delta="";
+    if(i<keys.length-1){
+      const pb=buckets[keys[i+1]],pavg=Math.round(pb.k/pb.days),diff=avg-pavg;
+      if(diff!==0)delta=` · ${diff>0?"+":""}${diff} к пред.`;
+    }
+    return `<div class="stat-week${wk===thisWk?" now":""}">
+      <div class="sw-lbl"><div class="sw-t">${lbl}</div>
+      <div class="sw-s">${b.days} ${b.days===1?"день":b.days<5?"дня":"дней"} записано${delta}</div></div>
+      <div class="sw-v"><div class="sw-k">${avg}</div>
+      <div class="sw-m">Б ${Math.round(b.p/b.days)} Ж ${Math.round(b.f/b.days)} У ${Math.round(b.c/b.days)}</div></div>
+    </div>`;
+  }).join("");
+}
+
+function calcFood(){
+  const w=parseFloat(document.getElementById("wIn").value.replace(",","."));
+  if(!w){toast("Введи вес","bad");S.no();return;}
+  const k=Math.round(w*30),p=Math.round(w*2),f=Math.round(w),c=Math.round((k-p*4-f*9)/4);
+  d.norm={k,p,f,c};save();
+  document.getElementById("foodOut").innerHTML=`<div class="tiles" style="grid-template-columns:repeat(4,1fr)">
+    <div class="tile"><div class="tile-v">${k}</div><div class="tile-l">ккал</div></div>
+    <div class="tile"><div class="tile-v">${p}</div><div class="tile-l">белок</div></div>
+    <div class="tile"><div class="tile-v">${f}</div><div class="tile-l">жиры</div></div>
+    <div class="tile"><div class="tile-v">${c}</div><div class="tile-l">углеводы</div></div></div>
+    <p style="font-size:12.5px;color:var(--text-2);margin-top:10px;line-height:1.55">Норма сохранена — теперь дневник считает остаток от неё.</p>`;
+  renderFood();S.ok();
+}
+
+/* ============ CHRONICLE ============ */
+function logProgress(){
+  const w=parseFloat(document.getElementById("wLog").value),p=parseInt(document.getElementById("pLog").value);
+  if(!w&&!p){toast("Введи хотя бы одно значение","bad");S.no();return;}
+  const dt=new Date().toLocaleDateString("ru");
+  if(w){d.weights.push({v:w,d:dt});hist("Вес: "+w+" кг");}
+  if(p){d.pulls.push({v:p,d:dt});hist("Подтягивания: "+p);}
+  document.getElementById("wLog").value="";document.getElementById("pLog").value="";
+  save();charts();render();toast("Записано","good");S.ok();
+}
+let c1,c2;
+function charts(){
+  if(c1)c1.destroy();if(c2)c2.destroy();
+  const a=getComputedStyle(document.body).getPropertyValue("--accent").trim()||"#D64933";
+  const o={responsive:true,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:"#6B625A",font:{size:10}},grid:{display:false}},
+            y:{ticks:{color:"#6B625A",font:{size:10}},grid:{color:"rgba(237,230,218,0.05)"}}}};
+  const mk=(el,lab,arr)=>new Chart(document.getElementById(el),{type:"line",
+    data:{labels:arr.map(e=>e.d),datasets:[{label:lab,data:arr.map(e=>e.v),borderColor:a,backgroundColor:a+"1a",pointBackgroundColor:a,pointRadius:3,tension:.35,fill:true,borderWidth:2}]},options:o});
+  c1=mk("wChart","Вес",d.weights);c2=mk("pChart","Подтягивания",d.pulls);
+}
+
+/* ============ WARRIOR ============ */
+function editName(){
+  document.getElementById("nameShow").style.display="none";
+  const i=document.getElementById("nameEdit");
+  i.style.display="block";i.value=d.playerName||"";i.focus();i.select();
+}
+function saveName(){
+  const v=document.getElementById("nameEdit").value.trim();
+  if(v)d.playerName=v;
+  document.getElementById("nameEdit").style.display="none";
+  document.getElementById("nameShow").style.display="inline-flex";
+  save();render();
+}
+function uploadAvatar(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{d.avatarImg=ev.target.result;save();render();toast("Портрет обновлён","good");};
+  r.readAsDataURL(f);
+}
+function renderWarrior(){
+  document.getElementById("nameTxt").textContent=d.playerName||"Безымянный";
+  document.getElementById("wRank").textContent=d.rank;
+  const f=document.getElementById("faceImg");
+  f.innerHTML=d.avatarImg?`<img src="${d.avatarImg}" alt="">`:(d.playerName?d.playerName.charAt(0).toUpperCase():"Λ");
+  document.getElementById("tLevel").textContent=d.level;
+  document.getElementById("tStreak").textContent=d.streak;
+  document.getElementById("tWeight").textContent=d.weights.length?d.weights[d.weights.length-1].v:"—";
+  document.getElementById("tTrials").textContent=d.trialsCount;
+  document.getElementById("tBooks").textContent=d.booksRead.length;
+  document.getElementById("tGoals").textContent=d.goals.filter(g=>g.done).length;
+  document.getElementById("virtues").innerHTML=[
+    ["Сила","str"],["Стойкость","end"],["Ловкость","ath"],["Аскеза","fat"],["Мудрость","int"]
+  ].map(([l,k])=>`<div class="tile"><div class="tile-v">${d[k]}</div><div class="tile-l">${l}</div></div>`).join("");
+  document.getElementById("histList").innerHTML=d.history.length
+    ?d.history.slice(0,15).map(h=>`<div class="log"><div class="log-t">${h.msg}</div><div class="log-d">${h.date}</div></div>`).join("")
+    :`<div class="empty"><div class="empty-txt">Летопись пуста. Первое дело её начнёт.</div></div>`;
+  renderPunish();
+}
+
+/* ============ DATA IO ============ */
+function exportData(){
+  const blob=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});
+  const u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download="agoge_"+new Date().toISOString().slice(0,10)+".json";a.click();
+  URL.revokeObjectURL(u);toast("Файл сохранён","good");S.ok();
+}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const o=JSON.parse(ev.target.result);
+      if(!o.level)throw 0;
+      if(!confirm("Заменить текущий прогресс данными из файла?"))return;
+      d=o;save();location.reload();
+    }catch(_){toast("Файл не подходит","bad");S.no();}
+  };
+  r.readAsText(f);
+}
+function resetAll(){
+  if(!confirm("Стереть весь путь?"))return;
+  if(!confirm("Точно? Ступени, долги, цели и трактаты будут утрачены навсегда."))return;
+  localStorage.removeItem("agoge");localStorage.removeItem("spartanProtocol");location.reload();
+}
+
+/* ============ THEME ============ */
+const THEMES=["t-bronze","t-olive","t-steel","t-obsidian","t-ash"];
+function setTheme(el){
+  const c=el.dataset.t;
+  document.body.classList.remove(...THEMES);
+  if(c)document.body.classList.add(c);
+  d.theme=c;save();
+  document.querySelectorAll(".sw").forEach(s=>s.classList.remove("on"));
+  el.classList.add("on");charts();S.ok();
+}
+function initTheme(){
+  const c=d.theme||"";
+  document.body.classList.remove(...THEMES);
+  if(c)document.body.classList.add(c);
+  document.querySelectorAll(".sw").forEach(s=>{s.classList.toggle("on",s.dataset.t===c);});
+}
+
+/* ============ NAV ============ */
+const SHEET_VIEWS=["warrior","food","chron","laws"];
+function go(v,btn){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("on"));
+  document.getElementById("v-"+v).classList.add("on");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("on"));
+  if(btn)btn.classList.add("on");
+  else if(SHEET_VIEWS.includes(v))document.getElementById("moreBtn").classList.add("on");
+  if(v==="chron")charts();
+  if(v==="food"){selDate=new Date();weekOffset=0;renderFood();}
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function openSheet(){document.getElementById("sheetBg").classList.add("open");document.getElementById("sheet").classList.add("open");}
+function closeSheet(){document.getElementById("sheetBg").classList.remove("open");document.getElementById("sheet").classList.remove("open");}
+
+/* ============ RENDER ============ */
+function render(){
+  document.getElementById("hLevel").textContent=d.level;
+  document.getElementById("hRank").textContent=d.rank;
+  document.getElementById("hXP").textContent=d.xp;
+  document.getElementById("hRing").style.strokeDashoffset=94.2-(94.2*Math.min(d.xp,100)/100);
+  document.getElementById("lvlChip").classList.toggle("legend",d.rank==="Легенда");
+  renderDuties();renderTrialPick();renderTrialLog();renderCustomTrials();
+  renderGoals();renderBooks();renderWarrior();renderFood();
+}
+
+/* ============ INIT ============ */
+initTheme();rank();resetDaily();render();charts();
+d.seenEvents=d.seenEvents||[];
+[10,20,50,100].forEach(l=>{if(d.level>=l&&!d.seenEvents.includes(l))showEvent(l);});
+
+/* ============ PWA ============ */
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
+function notify(t,b){
+  if('Notification' in window&&Notification.permission==='granted'){
+    navigator.serviceWorker.ready.then(sw=>sw.showNotification(t,{body:b,icon:'icon.png',badge:'icon.png',vibrate:[200,100,200],tag:'agoge'})).catch(()=>{});
+  }
+}
+setInterval(()=>{
+  const t=new Date().toDateString();
+  if(d.lastReset&&d.lastReset!==t){
+    const missed=d.questList.filter(q=>!q.done).length;
+    if(missed>0&&!d.punishment){
+      const p=PUNISH[Math.floor(Math.random()*PUNISH.length)];
+      d.punishment={task:p.task,desc:p.desc,date:new Date().toLocaleDateString("ru")};
+      notify('Кара Ареса','Вчера не исполнено: '+missed+'. Кара: '+p.task);
+    }
+    d.questList.forEach(q=>{q.done=false;q.failed=false;});
+    const y=new Date();y.setDate(y.getDate()-1);
+    if(d.lastReset!==y.toDateString())d.streak=0;
+    d.lastReset=t;save();render();
+    if(d.punishment)setTimeout(()=>{
+      document.getElementById("mTask").textContent=d.punishment.task;
+      document.getElementById("mDesc").textContent=d.punishment.desc;
+      document.getElementById("punishBg").classList.add("open");S.hit();
+    },600);
+  }
+},30000);
+</script>
+</body>
+</html>
